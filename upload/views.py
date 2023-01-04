@@ -6,15 +6,6 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-
-# class UploadView(viewsets.ModelViewSet):
-#     serializer_class=UploadSerializer
-#     queryset=Upload.objects.all()
-
-# class UploadLayerView(viewsets.ModelViewSet):
-#     serializer_class=UploadLayerSerializer
-#     queryset=Upload.objects.all()
-
 class uploadView(APIView):
     def get(self,request):
         uploads=Upload.objects.all()
