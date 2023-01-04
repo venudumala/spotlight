@@ -20,7 +20,6 @@ class UploadSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         instance.dump_layer=validated_data.get('dump_layer',instance.dump_layer)
-        instance.transformation_layer=validated_data.get('transformation_layer',instance.transformation_layer)
         instance.updated_at=validated_data.get('updated_at',instance.updated_at)
         instance.save()
         return instance
