@@ -2,6 +2,7 @@ import datetime,uuid
 from django.db import models
 
 class Upload(models.Model):
+    project_name=models.CharField(max_length=100,default=None,null=True)
     record_id=models.UUIDField(default=uuid.uuid4,editable = False,unique=True,max_length=100,null=True)
     file =models.FileField(upload_to='uploadfiles/',default=None)
     file_name =models.CharField(max_length=100,default=None,null=True)
@@ -30,3 +31,4 @@ class DataQualityCheck(models.Model):
 
     def __str__(self):
         return self.column_name
+

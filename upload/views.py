@@ -5,6 +5,7 @@ from .serializers import  DataQualityCheckSerializer, UploadSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db import connection
 
 class uploadView(APIView):
     def get(self,request):
@@ -16,6 +17,9 @@ class uploadView(APIView):
         insert_serializer=UploadSerializer(data=request.data)
         if insert_serializer.is_valid():
             insert_serializer.save()
+            cursor = connection.cursor()
+            ret = cursor.callproc("proc_schema_data",())
+            cursor.close()
             return Response(insert_serializer.data)
         
         else:
@@ -50,3 +54,20 @@ class dataQualityCheck(APIView):
         
         else:
             Response(dataQuality_serializer.errors)
+
+class getSchemaStructure(APIView):
+    def get(self,request):
+        cur = connection.cursor()
+        sql = "select column_name  from SPOTLIGHT.information_schema.columns where table_schema = 'BRONZE_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"'"
+        cur.execute(sql)
+        records = cur.fetchall()
+        return Response(records)
+
+class getSchemaData(APIView):
+    def get(self,request):
+        cur = connection.cursor()
+        # sql = "select "+self.request.query_params.get('columns_name') +"  from '"+self.request.query_params.get('table_name')+"'"
+        sql = "select "+self.request.query_params.get('columns_name') +"  from SPOTLIGHT.BRONZE_LAYER.BRONZE_LAYER"
+        cur.execute(sql)
+        records = cur.fetchall()
+        return Response(records)

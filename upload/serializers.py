@@ -5,6 +5,7 @@ from django.db import models
 class UploadSerializer(serializers.Serializer):
     id=serializers.IntegerField(read_only=True)
     record_id=serializers.IntegerField(read_only=True)
+    project_name=serializers.CharField(default=None)
     file=serializers.FileField(default=None)
     file_name=serializers.CharField(default=None)
     file_type=serializers.CharField(default=None)
