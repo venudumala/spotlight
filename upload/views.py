@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
-from .models import Upload
-from .serializers import  UploadSerializer
+from .models import DataQualityCheck, Upload
+from .serializers import  DataQualityCheckSerializer, UploadSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -36,35 +36,17 @@ class UploadLayerView(APIView):
         else:
             return Response(update_serializer.errors)
 
+class dataQualityCheck(APIView):
+    def get(self,request):
+        dataQuality=DataQualityCheck.objects.all()
+        dataQualitySerializer=DataQualityCheckSerializer(dataQuality,many=True)
+        return Response(dataQualitySerializer.data)
 
-# @api_view(['GET','POST'])
-# def uploaded_list(request):
-#     if request.method=='GET':
-#         uploads=Upload.objects.all()
-#         uploadserializer=UploadSerializer(uploads,many=True)
-#         return Response(uploadserializer.data)
-
-#     if request.method=='POST':
-#         insert_serializer=UploadSerializer(data=request.data)
-#         if insert_serializer.is_valid():
-#             insert_serializer.save()
-#             return Response(insert_serializer.data)
+    def post(self,request):
+        dataQuality_serializer=DataQualityCheckSerializer(data=request.data)
+        if dataQuality_serializer.is_valid():
+            dataQuality_serializer.save()
+            return Response(dataQuality_serializer.data)
         
-#         else:
-#             Response(insert_serializer.errors)
-
-# @api_view(['GET','PUT'])
-# def get_uploaded_list_id(request,pk):
-#     if request.method=='GET':
-#         get_uploaded_data=Upload.objects.get(pk=pk)
-#         get_uploaded_serializer=UploadSerializer(get_uploaded_data)
-#         return Response(get_uploaded_serializer.data)
-    
-#     if request.method=='PUT':
-#         get_uploaded_data=Upload.objects.get(pk=pk)
-#         update_serializer=UploadSerializer(get_uploaded_data,data=request.data)
-#         if update_serializer.is_valid():
-#             update_serializer.save()
-#             return Response(update_serializer.data)
-#         else:
-#             return Response(update_serializer.errors)
+        else:
+            Response(dataQuality_serializer.errors)

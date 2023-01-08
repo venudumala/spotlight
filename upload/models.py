@@ -16,3 +16,17 @@ class Upload(models.Model):
 
     def __str__(self):
         return self.file
+
+class DataQualityCheck(models.Model):
+    id =models.IntegerField(primary_key=True)
+    data_source=models.CharField(max_length=200,blank = True,null=True)
+    column_name=models.CharField(max_length=200,blank = True,null=True)
+    null_check=models.BooleanField(default=False,blank= True,null=True)
+    date_check=models.BooleanField(default=False,blank= True,null=True)
+    special_character_check=models.BooleanField(default=False,blank= True,null=True)
+    string_check=models.BooleanField(default=False,blank= True,null=True)
+    integer_check=models.BooleanField(default=False,blank= True,null=True)
+    created_at=models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.column_name

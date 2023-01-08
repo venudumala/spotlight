@@ -76,9 +76,9 @@ DATABASES = {
         'NAME': 'SPOTLIGHT',
         'SCHEMA': 'SPOTLIGHT',
         'WAREHOUSE': 'COMPUTE_WH',
-        'USER': 'Admin',
-        'PASSWORD': 'Admin@123',
-        'ACCOUNT': 'vxhlygl-mk95029',
+        'USER': 'anuraag1403',
+        'PASSWORD': 'Mithilesh@2702',
+        'ACCOUNT': 'gixqfxr-ez74008'
     },
 }
 
