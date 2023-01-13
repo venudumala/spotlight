@@ -73,12 +73,12 @@ WSGI_APPLICATION = 'spotlightapi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django_snowflake',
-        'NAME': 'SPOTLIGHT',
+        'NAME': 'SPOTLIGHTPOC',
         'SCHEMA': 'SPOTLIGHT',
         'WAREHOUSE': 'COMPUTE_WH',
-        'USER': 'anuraag1403',
-        'PASSWORD': 'Mithilesh@2702',
-        'ACCOUNT': 'gixqfxr-ez74008'
+        'USER': 'MaheshKolipaka',
+        'PASSWORD': 'M@hesh1234',
+        'ACCOUNT': 'nfyczpe-yq49101'
     },
 }
 

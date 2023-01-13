@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
-from .models import DataQualityCheck, Upload
-from .serializers import  DataQualityCheckSerializer, UploadSerializer
+from .models import DataQualityCheck, Project, Upload
+from .serializers import  DataQualityCheckSerializer, ProjectSerializer, UploadSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db import connection
+
 
 class uploadView(APIView):
     def get(self,request):
@@ -66,8 +67,23 @@ class getSchemaStructure(APIView):
 class getSchemaData(APIView):
     def get(self,request):
         cur = connection.cursor()
-        # sql = "select "+self.request.query_params.get('columns_name') +"  from '"+self.request.query_params.get('table_name')+"'"
         sql = "select "+self.request.query_params.get('columns_name') +"  from SPOTLIGHT.BRONZE_LAYER.BRONZE_LAYER"
         cur.execute(sql)
         records = cur.fetchall()
         return Response(records)
+
+class projectView(APIView):
+    def get(self,request):
+        project=Project.objects.all()
+        projectserializer=ProjectSerializer(project,many=True)
+        return Response(projectserializer.data)
+
+    def post(self,request):
+        project_serializer=ProjectSerializer(data=request.data)
+        print(project_serializer)
+        if project_serializer.is_valid():
+            project_serializer.save()
+            return Response(project_serializer.data)
+        
+        else:
+            return Response(project_serializer.errors)

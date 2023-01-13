@@ -12,5 +12,6 @@ urlpatterns = [
     path('uploaded_list/<int:pk>',views.UploadLayerView.as_view()),
     path('dataQualityCheck/',views.dataQualityCheck.as_view(),name='dataQualityCheck'),
     path('getSchemaStructure/',views.getSchemaStructure.as_view(),name='getSchemaStructure'),
-    path('getSchemaData/',views.getSchemaData.as_view(),name='getSchemaData')
+    path('getSchemaData/',views.getSchemaData.as_view(),name='getSchemaData'),
+    path('project/',views.projectView.as_view(),name='projectView')
 ]

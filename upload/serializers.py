@@ -1,6 +1,21 @@
 from rest_framework import serializers
-from .models import DataQualityCheck, Upload
+from .models import DataQualityCheck, Project, Upload
 from django.db import models
+
+class ProjectSerializer(serializers.Serializer):
+    id=serializers.IntegerField(read_only=True)
+    project_name=serializers.CharField(default=None)
+    user_name=serializers.CharField(default=None)
+    description=serializers.CharField(default=None)
+
+    def create(self, validated_data):
+        return Project.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.project_name=validated_data.get('project_name',instance.project_name)
+        instance.save()
+        return instance
+
 
 class UploadSerializer(serializers.Serializer):
     id=serializers.IntegerField(read_only=True)

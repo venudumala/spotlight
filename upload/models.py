@@ -1,6 +1,15 @@
 import datetime,uuid
 from django.db import models
 
+class Project(models.Model):
+    project_name=models.CharField(max_length=100,blank=True,unique=True,null=True)
+    user_name=models.CharField(max_length=100,blank=True,null=True)
+    description=models.CharField(max_length=100,blank=True,null=True)
+    created_at=models.DateTimeField(auto_now_add=True,blank=True,null=True)
+
+    def __str__(self):
+        return self.project_name
+
 class Upload(models.Model):
     project_name=models.CharField(max_length=100,default=None,null=True)
     record_id=models.UUIDField(default=uuid.uuid4,editable = False,unique=True,max_length=100,null=True)
@@ -13,13 +22,13 @@ class Upload(models.Model):
     records_inserted=models.BigIntegerField(blank = True,null=True)
     valid_file_path=models.CharField(max_length=200,blank = True,null=True)
     created_at=models.DateTimeField(auto_now=True)
-    updated_at=models.DateTimeField(null=True)
+    updated_at=models.DateTimeField(null=True,blank=True)
 
     def __str__(self):
         return self.file
 
 class DataQualityCheck(models.Model):
-    id =models.IntegerField(primary_key=True)
+    id =models.IntegerField(primary_key=True,auto_created=True)
     data_source=models.CharField(max_length=200,blank = True,null=True)
     column_name=models.CharField(max_length=200,blank = True,null=True)
     null_check=models.BooleanField(default=False,blank= True,null=True)
@@ -32,3 +41,14 @@ class DataQualityCheck(models.Model):
     def __str__(self):
         return self.column_name
 
+class Transformation(models.Model):
+    id =models.IntegerField(primary_key=True,auto_created=True)
+    data_source=models.CharField(max_length=200,blank = True,null=True)
+    column_name=models.CharField(max_length=200,blank = True,null=True)
+    date_transformation=models.BooleanField(default=False,blank= True,null=True)
+    currency_transformation=models.BooleanField(default=False,blank= True,null=True)
+    roundoff_transformation=models.BooleanField(default=False,blank= True,null=True)
+    created_at=models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.column_name
