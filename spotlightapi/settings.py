@@ -73,7 +73,7 @@ WSGI_APPLICATION = 'spotlightapi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django_snowflake',
-        'NAME': 'SPOTLIGHTPOC',
+        'NAME': 'SPOTLIGHT',
         'SCHEMA': 'SPOTLIGHT',
         'WAREHOUSE': 'COMPUTE_WH',
         'USER': 'MaheshKolipaka',

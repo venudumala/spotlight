@@ -1,12 +1,41 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
-from .models import DataQualityCheck, Project, Upload
-from .serializers import  DataQualityCheckSerializer, ProjectSerializer, UploadSerializer
+from .models import DataQualityCheck, DataSource, Project, Upload
+from .serializers import  DataQualityCheckSerializer, DataSourceSerializer, ProjectSerializer, UploadSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db import connection
 
+class projectView(APIView):
+    def get(self,request):
+        project=Project.objects.all()
+        projectserializer=ProjectSerializer(project,many=True)
+        return Response(projectserializer.data)
+
+    def post(self,request):
+        project_serializer=ProjectSerializer(data=request.data)
+        if project_serializer.is_valid():
+            project_serializer.save()
+            return Response(project_serializer.data)
+        
+        else:
+            return Response(project_serializer.errors)
+
+class DataSourceView(APIView):
+    def get(self,request):
+        data_source=DataSource.objects.all()
+        datasourceserializer=DataSourceSerializer(data_source,many=True)
+        return Response(datasourceserializer.data)
+
+    def post(self,request):
+        data_source_serializer=DataSourceSerializer(data=request.data)
+        if data_source_serializer.is_valid():
+            data_source_serializer.save()
+            return Response(data_source_serializer.data)
+        
+        else:
+            return Response(data_source_serializer.errors)
 
 class uploadView(APIView):
     def get(self,request):
@@ -71,19 +100,3 @@ class getSchemaData(APIView):
         cur.execute(sql)
         records = cur.fetchall()
         return Response(records)
-
-class projectView(APIView):
-    def get(self,request):
-        project=Project.objects.all()
-        projectserializer=ProjectSerializer(project,many=True)
-        return Response(projectserializer.data)
-
-    def post(self,request):
-        project_serializer=ProjectSerializer(data=request.data)
-        print(project_serializer)
-        if project_serializer.is_valid():
-            project_serializer.save()
-            return Response(project_serializer.data)
-        
-        else:
-            return Response(project_serializer.errors)

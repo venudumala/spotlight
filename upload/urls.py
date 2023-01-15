@@ -13,5 +13,6 @@ urlpatterns = [
     path('dataQualityCheck/',views.dataQualityCheck.as_view(),name='dataQualityCheck'),
     path('getSchemaStructure/',views.getSchemaStructure.as_view(),name='getSchemaStructure'),
     path('getSchemaData/',views.getSchemaData.as_view(),name='getSchemaData'),
-    path('project/',views.projectView.as_view(),name='projectView')
+    path('project/',views.projectView.as_view(),name='projectView'),
+    path('dataSource/',views.DataSourceView.as_view(),name='DataSourceSerializer')
 ]

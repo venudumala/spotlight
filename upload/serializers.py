@@ -1,9 +1,10 @@
 from rest_framework import serializers
-from .models import DataQualityCheck, Project, Upload
+from .models import DataQualityCheck, DataSource, Project, Upload
 from django.db import models
 
+
 class ProjectSerializer(serializers.Serializer):
-    id=serializers.IntegerField(read_only=True)
+    project_id=serializers.IntegerField(read_only=True)
     project_name=serializers.CharField(default=None)
     user_name=serializers.CharField(default=None)
     description=serializers.CharField(default=None)
@@ -16,6 +17,22 @@ class ProjectSerializer(serializers.Serializer):
         instance.save()
         return instance
 
+class DataSourceSerializer(serializers.Serializer):
+    id=serializers.IntegerField(read_only=True)
+    project_id=serializers.IntegerField(default=None)
+    data_source=serializers.CharField(default=None)
+    table_records=serializers.IntegerField(default=None)
+    total_records=serializers.IntegerField(default=None)
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now_add=True,blank=True,null=True)
+
+    def create(self, validated_data):
+        return DataSource.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.project_id=validated_data.get('project_id',instance.project_id)
+        instance.save()
+        return instance
 
 class UploadSerializer(serializers.Serializer):
     id=serializers.IntegerField(read_only=True)
