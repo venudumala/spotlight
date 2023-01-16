@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db import connection
+import pandas as pd
 
 class projectView(APIView):
     def get(self,request):
@@ -98,5 +99,6 @@ class getSchemaData(APIView):
         cur = connection.cursor()
         sql = "select "+self.request.query_params.get('columns_name') +"  from SPOTLIGHT.BRONZE_LAYER.BRONZE_LAYER"
         cur.execute(sql)
-        records = cur.fetchall()
-        return Response(records)
+        records = cur.fetch_pandas_all()
+        json = records.to_json()
+        return Response(json)
