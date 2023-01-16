@@ -83,5 +83,3 @@ class DataQualityCheckSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return DataQualityCheck.objects.create(**validated_data) 
-
-

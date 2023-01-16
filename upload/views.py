@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from .models import DataQualityCheck, DataSource, Database, Project, Upload
 from .serializers import  DataQualityCheckSerializer, DataSourceSerializer, DatabaseSerializer, ProjectSerializer, UploadSerializer
-from rest_framework import status
+from rest_framework import status,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db import connection
@@ -120,3 +120,11 @@ class getSchemaData(APIView):
         records = cur.fetch_pandas_all()
         json = records.to_json()
         return Response(json)
+
+class projectDataSourceData(APIView):
+    def get(self,request):
+        cur = connection.cursor()
+        sql = "select pr.PROJECT_NAME, pr.USER_NAME, pr.DESCRIPTION,ds.DATA_SOURCE, ds.TABLE_RECORDS, ds.TOTAL_RECORDS from SPOTLIGHT.SPOTLIGHT.UPLOAD_PROJECT as pr inner join SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE as ds on pr.id ="+self.request.query_params.get('project_id')
+        cur.execute(sql)
+        records = cur.fetch_pandas_all()
+        return Response(records)
