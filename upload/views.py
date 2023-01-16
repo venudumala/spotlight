@@ -118,8 +118,7 @@ class getSchemaData(APIView):
         sql = "select "+ columns_name+"  from SPOTLIGHT.BRONZE_LAYER."+self.request.query_params.get('table_name')
         cur.execute(sql)
         records = cur.fetch_pandas_all()
-        json = records.to_json()
-        return Response(json)
+        return Response(records)
 
 class projectDataSourceData(APIView):
     def get(self,request):
