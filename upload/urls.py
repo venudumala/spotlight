@@ -8,6 +8,7 @@ router=routers.DefaultRouter()
 
 urlpatterns = [
     path('',include(router.urls)),
+    path('database/',views.databaseView.as_view(),name='databaseView'),
     path('uploaded_list/',views.uploadView.as_view(),name='uploaded_list'),
     path('uploaded_list/<int:pk>',views.UploadLayerView.as_view()),
     path('dataQualityCheck/',views.dataQualityCheck.as_view(),name='dataQualityCheck'),

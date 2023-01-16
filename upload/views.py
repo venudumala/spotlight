@@ -1,12 +1,27 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
-from .models import DataQualityCheck, DataSource, Project, Upload
-from .serializers import  DataQualityCheckSerializer, DataSourceSerializer, ProjectSerializer, UploadSerializer
+from .models import DataQualityCheck, DataSource, Database, Project, Upload
+from .serializers import  DataQualityCheckSerializer, DataSourceSerializer, DatabaseSerializer, ProjectSerializer, UploadSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db import connection
 import pandas as pd
+
+class databaseView(APIView):
+    def get(self,request):
+        database=Database.objects.all()
+        databaseserializer=DatabaseSerializer(database,many=True)
+        return Response(databaseserializer.data)
+
+    def post(self,request):
+        database_serializer=DatabaseSerializer(data=request.data)
+        if database_serializer.is_valid():
+            database_serializer.save()
+            return Response(database_serializer.data)
+        
+        else:
+            return Response(database_serializer.errors)
 
 class projectView(APIView):
     def get(self,request):
@@ -97,7 +112,10 @@ class getSchemaStructure(APIView):
 class getSchemaData(APIView):
     def get(self,request):
         cur = connection.cursor()
-        sql = "select "+self.request.query_params.get('columns_name') +"  from SPOTLIGHT.BRONZE_LAYER.BRONZE_LAYER"
+        string1=self.request.query_params.get('columns_name').replace("'",'')
+        string2=string1.replace('[','')
+        columns_name=string2.replace(']','')
+        sql = "select "+ columns_name+"  from SPOTLIGHT.BRONZE_LAYER."+self.request.query_params.get('table_name')
         cur.execute(sql)
         records = cur.fetch_pandas_all()
         json = records.to_json()

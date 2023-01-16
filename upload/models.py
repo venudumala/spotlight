@@ -1,6 +1,13 @@
 import datetime,uuid
 from django.db import models
 
+class Database(models.Model):
+    id=models.IntegerField(primary_key=True,auto_created=True,default=1)
+    database_name=models.CharField(max_length=100,blank=True,unique=True,null=True)
+
+    def __str__(self):
+        return self.database_name
+
 class Project(models.Model):
     id=models.IntegerField(primary_key=True,auto_created=True,default=1)
     project_name=models.CharField(max_length=100,blank=True,unique=True,null=True)

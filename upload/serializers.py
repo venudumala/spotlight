@@ -1,9 +1,23 @@
 from rest_framework import serializers
-from .models import DataQualityCheck, DataSource, Project, Upload
+from .models import DataQualityCheck, DataSource, Database, Project, Upload
 from django.db import models
 
 
+class DatabaseSerializer(serializers.Serializer):
+    id=serializers.IntegerField(read_only=True)
+    database_name=serializers.BooleanField(default=None)
+
+    def create(self, validated_data):
+        return Database.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.database_name=validated_data.get('database_name',instance.database_name)
+        instance.save()
+        return instance
+
+
 class ProjectSerializer(serializers.Serializer):
+    id=serializers.IntegerField(read_only=True)
     project_id=serializers.IntegerField(read_only=True)
     project_name=serializers.CharField(default=None)
     user_name=serializers.CharField(default=None)
@@ -69,3 +83,5 @@ class DataQualityCheckSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return DataQualityCheck.objects.create(**validated_data) 
+
+
