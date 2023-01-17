@@ -13,6 +13,8 @@ urlpatterns = [
     path('getSchemaStructure/',views.getSchemaStructure.as_view(),name='getSchemaStructure'),
     path('getSchemaData/',views.getSchemaData.as_view(),name='getSchemaData'),
     path('project/',views.projectView.as_view(),name='projectView'),
+    path('silvergoldtransform/',views.silverGoldTransformView.as_view(),name='silvergoldtansform'),
+    path('bronzesilvertransform/',views.bronzeSilverTransform.as_view(),name='bronzeSilverTransform'),
     path('projectwithds/',views.projectDataSourceData.as_view(),name='projectDataSourceViewSet'),
     path('dataSource/',views.DataSourceView.as_view(),name='DataSourceSerializer')
 ]

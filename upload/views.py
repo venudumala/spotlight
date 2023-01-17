@@ -127,3 +127,29 @@ class projectDataSourceData(APIView):
         cur.execute(sql)
         records = cur.fetch_pandas_all()
         return Response(records)
+
+class silverGoldTransformView(APIView):
+    def post(self,request):
+        cursor = connection.cursor()
+        SOURCE_TABLE_NAME=self.request.query_params.get('SOURCE_TABLE_NAME')
+        TARGET_TABLE_NAME=self.request.query_params.get('TARGET_TABLE_NAME')
+        JOIN_STATEMENT=self.request.query_params.get('JOIN_STATEMENT')
+        FIRST_CLAUSE=self.request.query_params.get('FIRST_CLAUSE')
+        SECOND_CLAUSE=self.request.query_params.get('SECOND_CLAUSE')
+        string1=self.request.query_params.get('columns_name').replace("'",'')
+        string2=string1.replace('[','')
+        COLUMNS_NAME=string2.replace(']','')
+        ret = cursor.callproc("proc_silver_gold_tansform",(SOURCE_TABLE_NAME, TARGET_TABLE_NAME, COLUMNS_NAME, JOIN_STATEMENT, FIRST_CLAUSE, SECOND_CLAUSE))
+        cursor.close()
+        return Response("Success!!!")
+
+
+class bronzeSilverTransform(APIView):
+    def post(self,request):
+        cur = connection.cursor()
+        string1=self.request.query_params.get('columns_name').replace("'",'')
+        string2=string1.replace('[','')
+        columns_name=string2.replace(']','')
+        sql ="Insert into SPOTLIGHT.SILVER_LAYER."+self.request.query_params.get('silver_table') +"("+columns_name+")"+ " select "+columns_name+" from SPOTLIGHT.BRONZE_LAYER."+self.request.query_params.get('bronze_table')
+        cur.execute(sql)
+        return Response("Success!!!")
