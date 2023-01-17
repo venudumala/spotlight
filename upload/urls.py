@@ -15,6 +15,8 @@ urlpatterns = [
     path('project/',views.projectView.as_view(),name='projectView'),
     path('silvergoldtransform/',views.silverGoldTransformView.as_view(),name='silvergoldtansform'),
     path('bronzesilvertransform/',views.bronzeSilverTransform.as_view(),name='bronzeSilverTransform'),
+    path('getSilverTable/',views.getSilverTable.as_view(),name='getSilverTable'),
+    path('getSilverSchemaStructure/',views.getSilverSchemaStructure.as_view(),name='getSilverSchemaStructure'),
     path('projectwithds/',views.projectDataSourceData.as_view(),name='projectDataSourceViewSet'),
     path('dataSource/',views.DataSourceView.as_view(),name='DataSourceSerializer')
 ]
