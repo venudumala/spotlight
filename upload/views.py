@@ -153,3 +153,19 @@ class bronzeSilverTransform(APIView):
         sql ="Insert into SPOTLIGHT.SILVER_LAYER."+self.request.query_params.get('silver_table') +"("+columns_name+")"+ " select "+columns_name+" from SPOTLIGHT.BRONZE_LAYER."+self.request.query_params.get('bronze_table')
         cur.execute(sql)
         return Response("Success!!!")
+
+class getSilverTable(APIView):
+    def get(self,request):
+        cur = connection.cursor()
+        sql ="SELECT * from information_schema.tables where TABLE_SCHEMA='SILVER_LAYER' "
+        cur.execute(sql)
+        records = cur.fetch_pandas_all()
+        return Response(records)
+
+class getSilverSchemaStructure(APIView):
+    def get(self,request):
+        cur = connection.cursor()
+        sql = "select column_name  from SPOTLIGHT.information_schema.columns where table_schema = 'SILVER_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"'"
+        cur.execute(sql)
+        records = cur.fetchall()
+        return Response(records)
