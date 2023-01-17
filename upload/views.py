@@ -157,7 +157,7 @@ class bronzeSilverTransform(APIView):
 class getSilverTable(APIView):
     def get(self,request):
         cur = connection.cursor()
-        sql ="SELECT * from information_schema.tables where TABLE_SCHEMA='SILVER_LAYER' "
+        sql ="SELECT TABLE_NAME from information_schema.tables where TABLE_SCHEMA='SILVER_LAYER' "
         cur.execute(sql)
         records = cur.fetch_pandas_all()
         return Response(records)
