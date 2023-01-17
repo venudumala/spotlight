@@ -131,15 +131,19 @@ class projectDataSourceData(APIView):
 class silverGoldTransformView(APIView):
     def post(self,request):
         cursor = connection.cursor()
-        SOURCE_TABLE_NAME=self.request.query_params.get('SOURCE_TABLE_NAME')
+        SOURCE_TABLE_NAME1=self.request.query_params.get('SOURCE_TABLE_NAME1')
+        SOURCE_TABLE_NAME2=self.request.query_params.get('SOURCE_TABLE_NAME2')
         TARGET_TABLE_NAME=self.request.query_params.get('TARGET_TABLE_NAME')
         JOIN_STATEMENT=self.request.query_params.get('JOIN_STATEMENT')
         FIRST_CLAUSE=self.request.query_params.get('FIRST_CLAUSE')
         SECOND_CLAUSE=self.request.query_params.get('SECOND_CLAUSE')
-        string1=self.request.query_params.get('columns_name').replace("'",'')
+        string1=self.request.query_params.get('COLUMNS_NAME').replace("'",'')
         string2=string1.replace('[','')
         COLUMNS_NAME=string2.replace(']','')
-        ret = cursor.callproc("proc_silver_gold_tansform",(SOURCE_TABLE_NAME, TARGET_TABLE_NAME, COLUMNS_NAME, JOIN_STATEMENT, FIRST_CLAUSE, SECOND_CLAUSE))
+        string3=self.request.query_params.get('COLUMNS_NAME').replace("'",'')
+        string2=string1.replace('[','')
+        INSERT_COLUMNS_NAME=string2.replace(']','')
+        ret = cursor.callproc("proc_silver_gold_tansform",(SOURCE_TABLE_NAME1,SOURCE_TABLE_NAME2, TARGET_TABLE_NAME, INSERT_COLUMNS_NAME,COLUMNS_NAME, JOIN_STATEMENT, FIRST_CLAUSE, SECOND_CLAUSE))
         cursor.close()
         return Response("Success!!!")
 
