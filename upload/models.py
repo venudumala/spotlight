@@ -23,6 +23,7 @@ class DataSource(models.Model):
     data_source=models.CharField(max_length=100,blank=True,null=True)
     table_records=models.IntegerField(blank=True,null=True)
     total_records=models.IntegerField(blank=True,null=True)
+    final_data_file_generate=models.CharField(max_length=200,blank = True,null=True)
     created_at=models.DateTimeField(auto_now_add=True,blank=True,null=True)
     updated_at=models.DateTimeField(auto_now_add=True,blank=True,null=True)
 

@@ -123,30 +123,10 @@ class getSchemaData(APIView):
 class projectDataSourceData(APIView):
     def get(self,request):
         cur = connection.cursor()
-        sql = "select pr.PROJECT_NAME, pr.USER_NAME, pr.DESCRIPTION,ds.DATA_SOURCE, ds.TABLE_RECORDS, ds.TOTAL_RECORDS from SPOTLIGHT.SPOTLIGHT.UPLOAD_PROJECT as pr inner join SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE as ds on pr.id ="+self.request.query_params.get('project_id')
+        sql = "select pr.PROJECT_NAME, pr.USER_NAME, pr.DESCRIPTION,ds.DATA_SOURCE, ds.TABLE_RECORDS, ds.TOTAL_RECORDS,ds.FINAL_DATA_FILE_GENERATE from SPOTLIGHT.SPOTLIGHT.UPLOAD_PROJECT as pr inner join SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE as ds on pr.id ="+self.request.query_params.get('project_id')
         cur.execute(sql)
         records = cur.fetch_pandas_all()
         return Response(records)
-
-class silverGoldTransformView(APIView):
-    def post(self,request):
-        cursor = connection.cursor()
-        SOURCE_TABLE_NAME1=self.request.query_params.get('SOURCE_TABLE_NAME1')
-        SOURCE_TABLE_NAME2=self.request.query_params.get('SOURCE_TABLE_NAME2')
-        TARGET_TABLE_NAME=self.request.query_params.get('TARGET_TABLE_NAME')
-        JOIN_STATEMENT=self.request.query_params.get('JOIN_STATEMENT')
-        FIRST_CLAUSE=self.request.query_params.get('FIRST_CLAUSE')
-        SECOND_CLAUSE=self.request.query_params.get('SECOND_CLAUSE')
-        string1=self.request.query_params.get('COLUMNS_NAME').replace("'",'')
-        string2=string1.replace('[','')
-        COLUMNS_NAME=string2.replace(']','')
-        string3=self.request.query_params.get('COLUMNS_NAME').replace("'",'')
-        string2=string1.replace('[','')
-        INSERT_COLUMNS_NAME=string2.replace(']','')
-        ret = cursor.callproc("proc_silver_gold_tansform",(SOURCE_TABLE_NAME1,SOURCE_TABLE_NAME2, TARGET_TABLE_NAME, INSERT_COLUMNS_NAME,COLUMNS_NAME, JOIN_STATEMENT, FIRST_CLAUSE, SECOND_CLAUSE))
-        cursor.close()
-        return Response("Success!!!")
-
 
 class bronzeSilverTransform(APIView):
     def post(self,request):
@@ -173,3 +153,22 @@ class getSilverSchemaStructure(APIView):
         cur.execute(sql)
         records = cur.fetchall()
         return Response(records)
+
+class silverGoldTransformView(APIView):
+    def post(self,request):
+        cursor = connection.cursor()
+        SOURCE_TABLE_NAME1=self.request.query_params.get('SOURCE_TABLE_NAME1')
+        SOURCE_TABLE_NAME2=self.request.query_params.get('SOURCE_TABLE_NAME2')
+        TARGET_TABLE_NAME=self.request.query_params.get('TARGET_TABLE_NAME')
+        JOIN_STATEMENT=self.request.query_params.get('JOIN_STATEMENT')
+        FIRST_CLAUSE=self.request.query_params.get('FIRST_CLAUSE')
+        SECOND_CLAUSE=self.request.query_params.get('SECOND_CLAUSE')
+        string1=self.request.query_params.get('COLUMNS_NAME').replace("'",'')
+        string2=string1.replace('[','')
+        COLUMNS_NAME=string2.replace(']','')
+        string3=self.request.query_params.get('COLUMNS_NAME').replace("'",'')
+        string4=string3.replace('[','')
+        INSERT_COLUMNS_NAME=string4.replace(']','')
+        ret = cursor.callproc("proc_silver_gold_tansform",(SOURCE_TABLE_NAME1,SOURCE_TABLE_NAME2, TARGET_TABLE_NAME, INSERT_COLUMNS_NAME,COLUMNS_NAME, JOIN_STATEMENT, FIRST_CLAUSE, SECOND_CLAUSE))
+        cursor.close()
+        return Response("Success!!!")

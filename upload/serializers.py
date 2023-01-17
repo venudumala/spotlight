@@ -37,6 +37,7 @@ class DataSourceSerializer(serializers.Serializer):
     data_source=serializers.CharField(default=None)
     table_records=serializers.IntegerField(default=None)
     total_records=serializers.IntegerField(default=None)
+    final_data_file_generate=serializers.CharField(default=None)
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now_add=True,blank=True,null=True)
 
