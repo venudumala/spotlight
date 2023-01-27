@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
-from .models import DataQualityCheck, DataSource, Database, Project, Upload
-from .serializers import  DataQualityCheckSerializer, DataSourceSerializer, DatabaseSerializer, ProjectSerializer, UploadSerializer
+from .models import DataQualityCheck, DataSource, Database, Project, QueryLogs, Upload
+from .serializers import  DataQualityCheckSerializer, DataSourceSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer
 from rest_framework import status,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -168,3 +168,34 @@ class silverGoldTransformView(APIView):
         ret = cursor.callproc("proc_silver_gold_tansform",(SOURCE_TABLE_NAME1,SOURCE_TABLE_NAME2, TARGET_TABLE_NAME, INSERT_COLUMNS_NAME,COLUMNS_NAME, JOIN_STATEMENT, FIRST_CLAUSE, SECOND_CLAUSE))
         cursor.close()
         return Response("Success!!!")
+
+class getSilverTableData(APIView):
+    def get(self,request):
+        cur = connection.cursor()
+        sql = "select *  from SILVER_LAYER.'"+self.request.query_params.get('table_name')+"'"
+        cur.execute(sql)
+        records = cur.fetchall()
+        return Response(records)
+
+class getQueryData(APIView):
+    def get(self,request):
+        cur = connection.cursor()
+        sql = "select *  from SILVER_LAYER.'"+self.request.query_params.get('table_name')+"'"
+        cur.execute(sql)
+        records = cur.fetchall()
+        return Response(records)
+
+class QueryLogsView(APIView):
+    def get(self,request):
+        querylogs=QueryLogs.objects.all()
+        querylogsserializer=QueryLogsSerializer(querylogs,many=True)
+        return Response(querylogsserializer.data)
+
+    def post(self,request):
+        querylogs_serializer=ProjectSerializer(data=request.data)
+        if querylogs_serializer.is_valid():
+            querylogs_serializer.save()
+            return Response(querylogs_serializer.data)
+        
+        else:
+            return Response(querylogs_serializer.errors)

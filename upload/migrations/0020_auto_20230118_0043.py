@@ -23,6 +23,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='datasource',
             name='project_id',
-            field=models.BigIntegerField(),
+            field=models.IntegerField(),
         ),
     ]

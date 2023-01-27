@@ -73,3 +73,14 @@ class Transformation(models.Model):
 
     def __str__(self):
         return self.column_name
+
+class QueryLogs(models.Model):
+    id =models.IntegerField(primary_key=True,auto_created=True)
+    project_name=models.IntegerField(blank = True,null=True)
+    data_source=models.IntegerField(blank = True,null=True)
+    query_statement=models.CharField(max_length=1000,blank = True,null=True)
+    target_table=models.CharField(max_length=100,blank = True,null=True)
+    created_at=models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.query_statement
