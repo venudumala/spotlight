@@ -20,5 +20,5 @@ urlpatterns = [
     path('projectwithds/',views.projectDataSourceData.as_view(),name='projectDataSourceViewSet'),
     path('getSilverTableData/',views.getSilverTableData.as_view(),name='getSilverTableData'),
     path('QueryLogs/',views.QueryLogsView.as_view(),name='QueryLogs'),
-    path('dataSource/',views.DataSourceView.as_view(),name='DataSourceSerializer')
+    path('dataSource/<int:project_id>/<str:data_source>',views.DataSourceView.as_view())
 ]

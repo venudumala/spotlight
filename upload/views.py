@@ -44,14 +44,11 @@ class DataSourceView(APIView):
         datasourceserializer=DataSourceSerializer(data_source,many=True)
         return Response(datasourceserializer.data)
 
-    def post(self,request):
-        data_source_serializer=DataSourceSerializer(data=request.data)
-        if data_source_serializer.is_valid():
-            data_source_serializer.save()
-            return Response(data_source_serializer.data)
-        
-        else:
-            return Response(data_source_serializer.errors)
+    def post(self,request,project_id,data_source):
+        cursor = connection.cursor()
+        ret = cursor.callproc("proc_create_datasource",(project_id,data_source))
+        cursor.close()
+        return Response("Success!!!")
 
 class uploadView(APIView):
     def get(self,request):
@@ -178,9 +175,11 @@ class getSilverTableData(APIView):
         return Response(records)
 
 class getQueryData(APIView):
-    def get(self,request):
+    def get(self):
         cur = connection.cursor()
-        sql = "select *  from SILVER_LAYER.'"+self.request.query_params.get('table_name')+"'"
+        table_name=self.request.query_params.get('table_name')
+        table_name1=table_name.replace("'",'')
+        sql = "select *  from SILVER_LAYER."+table_name1
         cur.execute(sql)
         records = cur.fetchall()
         return Response(records)

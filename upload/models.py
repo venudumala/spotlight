@@ -76,7 +76,7 @@ class Transformation(models.Model):
 
 class QueryLogs(models.Model):
     id =models.IntegerField(primary_key=True,auto_created=True)
-    project_name=models.IntegerField(blank = True,null=True)
+    project_id=models.IntegerField(blank = True,null=True)
     data_source=models.IntegerField(blank = True,null=True)
     query_statement=models.CharField(max_length=1000,blank = True,null=True)
     target_table=models.CharField(max_length=100,blank = True,null=True)

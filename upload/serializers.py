@@ -89,7 +89,7 @@ class DataQualityCheckSerializer(serializers.Serializer):
 class QueryLogsSerializer(serializers.Serializer):
     id=serializers.IntegerField(read_only=True)
     data_source=serializers.IntegerField()
-    project_name=serializers.IntegerField()
+    project_id=serializers.IntegerField()
     query_statement=serializers.IntegerField()
     target_table=serializers.IntegerField()
     created_at=models.DateTimeField(auto_now_add=True)
