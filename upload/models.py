@@ -83,3 +83,10 @@ class QueryLogs(models.Model):
 
     def __str__(self):
         return self.query_statement
+
+class DataType(models.Model):
+    datatype=models.CharField(max_length=1000,blank = True,null=True)
+    created_at=models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.DataType

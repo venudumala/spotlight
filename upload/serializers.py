@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import DataQualityCheck, DataSource, Database, Project, Upload
+from .models import DataQualityCheck, DataSource, DataType, Database, Project, Upload
 from django.db import models
 
 
@@ -88,3 +88,11 @@ class QueryLogsSerializer(serializers.Serializer):
     query_statement=serializers.IntegerField()
     target_table=serializers.IntegerField()
     created_at=models.DateTimeField(auto_now_add=True)
+
+class DataTypeSerializer(serializers.Serializer):
+    id=serializers.IntegerField(read_only=True)
+    datatype=serializers.CharField()
+    created_at=models.DateTimeField(auto_now_add=True)
+
+    def create(self, validated_data):
+        return DataType.objects.create(**validated_data)

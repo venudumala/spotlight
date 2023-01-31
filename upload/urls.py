@@ -23,5 +23,7 @@ urlpatterns = [
     path('getSilverTableData/<str:table_name>',views.getSilverTableData.as_view()),
     path('getBronzeTableData/<str:table_name>',views.getBronzeTableData.as_view()),
     path('QueryLogs/',views.QueryLogsView.as_view(),name='QueryLogs'),
+    path('dataTypeView/',views.dataTypeView.as_view(),name='dataTypeView'),
+    path('alterTableSilver/',views.alterTableSilver.as_view(),name='alterTableSilver'),
     path('dataSource/<int:project_id>/<str:data_source>',views.DataSourceView.as_view())
 ]

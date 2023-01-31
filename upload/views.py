@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
-from .models import DataQualityCheck, DataSource, Database, Project, QueryLogs, Upload
-from .serializers import  DataQualityCheckSerializer, DataSourceSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer
+from .models import DataQualityCheck, DataSource, DataType, Database, Project, QueryLogs, Upload
+from .serializers import  DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer
 from rest_framework import status,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -120,7 +120,7 @@ class getSchemaData(APIView):
 class projectDataSourceData(APIView):
     def get(self,request):
         cur = connection.cursor()
-        sql = "select pr.PROJECT_NAME, pr.USER_NAME, pr.DESCRIPTION,ds.DATA_SOURCE, ds.TABLE_RECORDS, ds.TOTAL_RECORDS,ds.FINAL_DATA_FILE_GENERATE from SPOTLIGHT.SPOTLIGHT.UPLOAD_PROJECT as pr inner join SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE as ds on pr.id ="+self.request.query_params.get('project_id')
+        sql = "select pr.PROJECT_NAME, pr.USER_NAME, pr.DESCRIPTION,ds.DATA_SOURCE, ds.TABLE_RECORDS, ds.TOTAL_RECORDS,ds.FINAL_DATA_FILE_GENERATE from SPOTLIGHT.SPOTLIGHT.UPLOAD_PROJECT as pr inner join SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE as ds on pr.id =ds.project_id where pr.id="+self.request.query_params.get('project_id')
         cur.execute(sql)
         records = cur.fetch_pandas_all().to_json(orient='records')
         return Response(records)
@@ -192,7 +192,7 @@ class QueryLogsView(APIView):
 class getBronzeTable(APIView):
     def get(self,request):
         cur = connection.cursor()
-        sql ="Select DATA_SOURCE from SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE where PROJECT_ID="+self.request.query_params.get('project_id')
+        sql ="Select UPPER(DATA_SOURCE) from SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE where PROJECT_ID="+self.request.query_params.get('project_id')
         cur.execute(sql)
         records = cur.fetch_pandas_all()
         return Response(records)
@@ -212,3 +212,34 @@ class getBronzeTableData(APIView):
         cur.execute(sql)
         records = cur.fetch_pandas_all().to_json(orient='records')
         return Response(records)
+
+class checkColumnSilverTable(APIView):
+    def get(self,request):
+        cur = connection.cursor()
+        sql = "select to_boolean(count(1)) SPOTLIGHT.information_schema.columns where table_schema = 'SILVER_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"' and COLUMN_NAME='"+self.request.query_params.get('column_name')+"';"
+        cur.execute(sql)
+        records = cur.fetchall()
+        return Response(records)
+
+class alterTableSilver(APIView):
+    def get(self,request):
+        cur = connection.cursor()
+        sql = "Alter TABLE "+self.request.query_params.get('table_name')+"' ADD "+self.request.query_params.get('column_name')+"';"
+        cur.execute(sql)
+        records = cur.fetchall()
+        return Response(records)
+
+class dataTypeView(APIView):
+    def get(self,request):
+        database=DataType.objects.all()
+        databaseserializer=DataTypeSerializer(database,many=True)
+        return Response(databaseserializer.data)
+
+    def post(self,request):
+        database_serializer=DataTypeSerializer(data=request.data)
+        if database_serializer.is_valid():
+            database_serializer.save()
+            return Response(database_serializer.data)
+        
+        else:
+            return Response(database_serializer.errors)
