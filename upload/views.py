@@ -167,21 +167,11 @@ class silverGoldTransformView(APIView):
         return Response("Success!!!")
 
 class getSilverTableData(APIView):
-    def get(self,request):
+    def get(self,request,table_name):
         cur = connection.cursor()
-        sql = "select *  from SILVER_LAYER.'"+self.request.query_params.get('table_name')+"'"
+        sql = "select *  from SILVER_LAYER."+table_name
         cur.execute(sql)
-        records = cur.fetchall()
-        return Response(records)
-
-class getQueryData(APIView):
-    def get(self):
-        cur = connection.cursor()
-        table_name=self.request.query_params.get('table_name')
-        table_name1=table_name.replace("'",'')
-        sql = "select *  from SILVER_LAYER."+table_name1
-        cur.execute(sql)
-        records = cur.fetchall()
+        records = cur.fetch_pandas_all().to_json(orient='records')
         return Response(records)
 
 class QueryLogsView(APIView):
@@ -198,3 +188,19 @@ class QueryLogsView(APIView):
         
         else:
             return Response(querylogs_serializer.errors)
+
+class getBronzeTable(APIView):
+    def get(self,request):
+        cur = connection.cursor()
+        sql ="Select DATA_SOURCE from SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE where PROJECT_ID="+self.request.query_params.get('project_id')
+        cur.execute(sql)
+        records = cur.fetch_pandas_all()
+        return Response(records)
+
+class getBronzeSchemaStructure(APIView):
+    def get(self,request):
+        cur = connection.cursor()
+        sql = "select column_name  from SPOTLIGHT.information_schema.columns where table_schema = 'BRONZE_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"'"
+        cur.execute(sql)
+        records = cur.fetchall()
+        return Response(records)

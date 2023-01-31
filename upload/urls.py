@@ -17,8 +17,10 @@ urlpatterns = [
     path('bronzesilvertransform/',views.bronzeSilverTransform.as_view(),name='bronzeSilverTransform'),
     path('getSilverTable/',views.getSilverTable.as_view(),name='getSilverTable'),
     path('getSilverSchemaStructure/',views.getSilverSchemaStructure.as_view(),name='getSilverSchemaStructure'),
-    path('projectwithds/',views.projectDataSourceData.as_view(),name='projectDataSourceViewSet'),
-    path('getSilverTableData/',views.getSilverTableData.as_view(),name='getSilverTableData'),
+    path('getBronzeTable/',views.getBronzeTable.as_view(),name='getBronzeTable'),
+    path('getBronzeSchemaStructure/',views.getBronzeSchemaStructure.as_view(),name='getBronzeSchemaStructure'),
+    path('projectwithids/',views.projectDataSourceData.as_view(),name='projectDataSourceViewSet'),
+    path('getSilverTableData/<str:table_name>',views.getSilverTableData.as_view()),
     path('QueryLogs/',views.QueryLogsView.as_view(),name='QueryLogs'),
     path('dataSource/<int:project_id>/<str:data_source>',views.DataSourceView.as_view())
 ]

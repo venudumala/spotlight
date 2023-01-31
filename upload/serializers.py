@@ -31,15 +31,10 @@ class ProjectSerializer(serializers.Serializer):
         instance.save()
         return instance
 
-class DataSourceSerializer(serializers.Serializer):
-    id=serializers.IntegerField(read_only=True)
-    project_id=serializers.IntegerField(default=None)
-    data_source=serializers.CharField(default=None)
-    table_records=serializers.IntegerField(default=None)
-    total_records=serializers.IntegerField(default=None)
-    final_data_file_generate=serializers.CharField(default=None)
-    created_at=models.DateTimeField(auto_now_add=True)
-    updated_at=models.DateTimeField(auto_now_add=True,blank=True,null=True)
+class DataSourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DataSource
+        fields = ('id','project_id','data_source','table_records','total_records','final_data_file_generate','created_at','updated_at')
 
     def create(self, validated_data):
         return DataSource.objects.create(**validated_data)
