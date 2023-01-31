@@ -171,7 +171,7 @@ class getSilverTableData(APIView):
         cur = connection.cursor()
         sql = "select *  from SILVER_LAYER."+table_name
         cur.execute(sql)
-        records = cur.fetch_pandas_all().to_json(orient='records')
+        records = cur.fetch_pandas_all()
         return Response(records)
 
 class QueryLogsView(APIView):
@@ -210,7 +210,7 @@ class getBronzeTableData(APIView):
         cur = connection.cursor()
         sql = "select *  from BRONZE_LAYER."+table_name
         cur.execute(sql)
-        records = cur.fetch_pandas_all().to_json(orient='records')
+        records = cur.fetch_pandas_all()
         return Response(records)
 
 class checkColumnSilverTable(APIView):
