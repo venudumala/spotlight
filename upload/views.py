@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from .models import DataQualityCheck, DataSource, DataType, Database, Project, QueryLogs, Upload
@@ -7,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db import connection
 import pandas as pd
+from rest_framework.generics import ListAPIView
 
 class databaseView(APIView):
     def get(self,request):
@@ -210,8 +212,8 @@ class getBronzeTableData(APIView):
         cur = connection.cursor()
         sql = "select *  from BRONZE_LAYER."+table_name
         cur.execute(sql)
-        records = cur.fetch_pandas_all()
-        return Response(records)
+        records = cur.fetch_pandas_all().to_json(orient='records')
+        return HttpResponse(records)
 
 class checkColumnSilverTable(APIView):
     def get(self,request):
