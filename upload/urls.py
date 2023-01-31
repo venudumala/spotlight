@@ -26,5 +26,6 @@ urlpatterns = [
     path('dataTypeView/',views.dataTypeView.as_view(),name='dataTypeView'),
     path('alterTableSilver/',views.alterTableSilver.as_view(),name='alterTableSilver'),
     path('checkColumnSilverTable/',views.checkColumnSilverTable.as_view(),name='checkColumnSilverTable'),
+    path('alterTableSilver/',views.alterTableSilver.as_view(),name='alterTableSilver'),
     path('dataSource/<int:project_id>/<str:data_source>',views.DataSourceView.as_view())
 ]

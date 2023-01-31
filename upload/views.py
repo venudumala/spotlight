@@ -216,7 +216,7 @@ class getBronzeTableData(APIView):
 class checkColumnSilverTable(APIView):
     def get(self,request):
         cur = connection.cursor()
-        sql = "select to_boolean(count(1)) SPOTLIGHT.information_schema.columns where table_schema = 'SILVER_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"' and COLUMN_NAME='"+self.request.query_params.get('column_name')+"';"
+        sql = "select to_boolean(count(1)) from SPOTLIGHT.information_schema.columns where table_schema = 'SILVER_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"' and COLUMN_NAME='"+self.request.query_params.get('column_name')+"';"
         cur.execute(sql)
         records = cur.fetchall()
         return Response(records)
@@ -224,7 +224,8 @@ class checkColumnSilverTable(APIView):
 class alterTableSilver(APIView):
     def get(self,request):
         cur = connection.cursor()
-        sql = "Alter TABLE "+self.request.query_params.get('table_name')+"' ADD "+self.request.query_params.get('column_name')+"';"
+        sql = "Alter TABLE SPOTLIGHT.SILVER_LAYER."+self.request.query_params.get('table_name')+" ADD "+self.request.query_params.get('column_name')+" "+self.request.query_params.get('data_type')
+        print(sql)
         cur.execute(sql)
         records = cur.fetchall()
         return Response(records)
