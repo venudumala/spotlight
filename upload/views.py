@@ -204,3 +204,11 @@ class getBronzeSchemaStructure(APIView):
         cur.execute(sql)
         records = cur.fetchall()
         return Response(records)
+
+class getBronzeTableData(APIView):
+    def get(self,request,table_name):
+        cur = connection.cursor()
+        sql = "select *  from BRONZE_LAYER."+table_name
+        cur.execute(sql)
+        records = cur.fetch_pandas_all().to_json(orient='records')
+        return Response(records)

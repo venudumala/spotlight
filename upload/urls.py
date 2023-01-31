@@ -21,6 +21,7 @@ urlpatterns = [
     path('getBronzeSchemaStructure/',views.getBronzeSchemaStructure.as_view(),name='getBronzeSchemaStructure'),
     path('projectwithids/',views.projectDataSourceData.as_view(),name='projectDataSourceViewSet'),
     path('getSilverTableData/<str:table_name>',views.getSilverTableData.as_view()),
+    path('getBronzeTableData/<str:table_name>',views.getBronzeTableData.as_view()),
     path('QueryLogs/',views.QueryLogsView.as_view(),name='QueryLogs'),
     path('dataSource/<int:project_id>/<str:data_source>',views.DataSourceView.as_view())
 ]
