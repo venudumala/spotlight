@@ -192,7 +192,7 @@ class QueryLogsView(APIView):
 class getBronzeTable(APIView):
     def get(self,request):
         cur = connection.cursor()
-        sql ="Select UPPER(DATA_SOURCE) from SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE where PROJECT_ID="+self.request.query_params.get('project_id')
+        sql ="Select UPPER(DATA_SOURCE) as DATA_SOURCE from SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE where PROJECT_ID="+self.request.query_params.get('project_id')
         cur.execute(sql)
         records = cur.fetch_pandas_all()
         return Response(records)
