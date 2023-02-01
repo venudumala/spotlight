@@ -179,7 +179,7 @@ class bronzeSilverInsert(APIView):
         FIRST_CLAUSE=self.request.query_params.get('FIRST_CLAUSE')
         SECOND_CLAUSE=self.request.query_params.get('SECOND_CLAUSE')
         COLUMNS_NAME=self.request.query_params.get('COLUMNS_NAME')
-        sql="create or replace table SILVER_LAYER.TEMP."+TARGET_TABLE_NAME+ "as select "+COLUMNS_NAME +" from "+SOURCE_TABLE_NAME1+" "+JOIN_STATEMENT +" "+SOURCE_TABLE_NAME2+ " on "+FIRST_CLAUSE+" = "+SECOND_CLAUSE
+        sql="create or replace table SILVER_LAYER.TEMP_"+TARGET_TABLE_NAME+ " as select "+COLUMNS_NAME +" from "+SOURCE_TABLE_NAME1+" "+JOIN_STATEMENT +" "+SOURCE_TABLE_NAME2+ " on "+FIRST_CLAUSE+" = "+SECOND_CLAUSE
         print(sql)
         cur.execute(sql)
         cur.close()

@@ -61,7 +61,6 @@ class DataQualityCheck(models.Model):
         return self.column_name
 
 class Transformation(models.Model):
-    id =models.IntegerField(primary_key=True,auto_created=True)
     data_source=models.CharField(max_length=200,blank = True,null=True)
     column_name=models.CharField(max_length=200,blank = True,null=True)
     date_transformation=models.BooleanField(default=False,blank= True,null=True)
@@ -73,7 +72,6 @@ class Transformation(models.Model):
         return self.column_name
 
 class QueryLogs(models.Model):
-    id =models.IntegerField(primary_key=True,auto_created=True)
     project_id=models.IntegerField(blank = True,null=True)
     data_source=models.IntegerField(blank = True,null=True)
     query_statement=models.CharField(max_length=1000,blank = True,null=True)
