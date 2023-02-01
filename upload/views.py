@@ -1,8 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework.decorators import api_view
-from .models import DataQualityCheck, DataSource, DataType, Database, Project, QueryLogs, Upload
-from .serializers import  DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer
+from .models import DataQualityCheck, DataSource, DataType, Database, Project, QueryLogs, Upload, filterSymbol
+from .serializers import  DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer, filterSymbolSerializer
 from rest_framework import status,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -164,8 +164,25 @@ class silverGoldTransformView(APIView):
         SECOND_CLAUSE=self.request.query_params.get('SECOND_CLAUSE')
         COLUMNS_NAME=self.request.query_params.get('COLUMNS_NAME')
         INSERT_COLUMNS_NAME=self.request.query_params.get('INSERT_COLUMNS_NAME')
-        ret = cursor.callproc("proc_silver_gold_tansform",(SOURCE_TABLE_NAME1,SOURCE_TABLE_NAME2, TARGET_TABLE_NAME, INSERT_COLUMNS_NAME,COLUMNS_NAME, JOIN_STATEMENT, FIRST_CLAUSE, SECOND_CLAUSE))
+        FILTER_COLUMN=self.request.query_params.get('FILTER_COLUMN')
+        ret = cursor.callproc("proc_silver_gold_tansform",(SOURCE_TABLE_NAME1,SOURCE_TABLE_NAME2, TARGET_TABLE_NAME, INSERT_COLUMNS_NAME,COLUMNS_NAME, JOIN_STATEMENT, FIRST_CLAUSE, SECOND_CLAUSE,FILTER_COLUMN))
         cursor.close()
+        return Response("Success!!!")
+
+class bronzeSilverInsert(APIView):
+    def post(self,request):
+        cur = connection.cursor()
+        SOURCE_TABLE_NAME1=self.request.query_params.get('SOURCE_TABLE_NAME1')
+        SOURCE_TABLE_NAME2=self.request.query_params.get('SOURCE_TABLE_NAME2')
+        TARGET_TABLE_NAME=self.request.query_params.get('TARGET_TABLE_NAME')
+        JOIN_STATEMENT=self.request.query_params.get('JOIN_STATEMENT')
+        FIRST_CLAUSE=self.request.query_params.get('FIRST_CLAUSE')
+        SECOND_CLAUSE=self.request.query_params.get('SECOND_CLAUSE')
+        COLUMNS_NAME=self.request.query_params.get('COLUMNS_NAME')
+        sql="create or replace table SILVER_LAYER.TEMP."+TARGET_TABLE_NAME+ "as select "+COLUMNS_NAME +" from "+SOURCE_TABLE_NAME1+" "+JOIN_STATEMENT +" "+SOURCE_TABLE_NAME2+ " on "+FIRST_CLAUSE+" = "+SECOND_CLAUSE
+        print(sql)
+        cur.execute(sql)
+        cur.close()
         return Response("Success!!!")
 
 class getSilverTableData(APIView):
@@ -174,6 +191,7 @@ class getSilverTableData(APIView):
         sql = "select *  from SILVER_LAYER."+table_name
         cur.execute(sql)
         records = cur.fetch_pandas_all()
+        cur.close()
         return Response(records)
 
 class QueryLogsView(APIView):
@@ -246,3 +264,18 @@ class dataTypeView(APIView):
         
         else:
             return Response(database_serializer.errors)
+
+class filterSymbolView(APIView):
+    def get(self,request):
+        filterSymbol=filterSymbol.objects.all()
+        filterSymbolserializer=filterSymbolSerializer(filterSymbol,many=True)
+        return Response(filterSymbolserializer.data)
+
+    def post(self,request):
+        filterSymbol_serializer=filterSymbolSerializer(data=request.data)
+        if filterSymbol_serializer.is_valid():
+            filterSymbol_serializer.save()
+            return Response(filterSymbol_serializer.data)
+        
+        else:
+            return Response(filterSymbol_serializer.errors)

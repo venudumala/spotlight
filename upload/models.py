@@ -48,7 +48,6 @@ class Upload(models.Model):
         return self.file
 
 class DataQualityCheck(models.Model):
-    id =models.IntegerField(primary_key=True,auto_created=True)
     data_source=models.CharField(max_length=200,blank = True,null=True)
     column_name=models.CharField(max_length=200,blank = True,null=True)
     null_check=models.BooleanField(default=False,blank= True,null=True)
@@ -56,7 +55,7 @@ class DataQualityCheck(models.Model):
     special_character_check=models.BooleanField(default=False,blank= True,null=True)
     string_check=models.BooleanField(default=False,blank= True,null=True)
     integer_check=models.BooleanField(default=False,blank= True,null=True)
-    created_at=models.DateTimeField(auto_now=True)
+    created_at=models.DateTimeField(auto_now=True,blank= True,null=True)
 
     def __str__(self):
         return self.column_name
@@ -90,3 +89,7 @@ class DataType(models.Model):
 
     def __str__(self):
         return self.DataType
+
+class filterSymbol(models.Model):
+    symbol=models.CharField(max_length=10,blank = True,null=True)
+    created_at=models.DateTimeField(auto_now=True,blank= True,null=True)

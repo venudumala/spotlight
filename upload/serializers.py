@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import DataQualityCheck, DataSource, DataType, Database, Project, Upload
+from .models import DataQualityCheck, DataSource, DataType, Database, Project, Upload, filterSymbol
 from django.db import models
 
 
@@ -96,3 +96,10 @@ class DataTypeSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return DataType.objects.create(**validated_data)
+
+class filterSymbolSerializer(serializers.Serializer):
+     id=serializers.IntegerField(read_only=True)
+     symbol=serializers.CharField(default=None)
+
+     def create(self, validated_data):
+        return filterSymbol.objects.create(**validated_data)
