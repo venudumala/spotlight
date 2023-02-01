@@ -9,7 +9,7 @@ urlpatterns = [
     path('database/',views.databaseView.as_view(),name='databaseView'),
     path('uploaded_list/',views.uploadView.as_view(),name='uploaded_list'),
     path('uploaded_list/<int:pk>',views.UploadLayerView.as_view()),
-    path('dataQualityCheck/',views.dataQualityCheck.as_view(),name='dataQualityCheck'),
+    path('dataQualityCheck/',views.dataQualityCheck.as_view(),name='dataQualityCheck-create'),
     path('getSchemaStructure/',views.getSchemaStructure.as_view(),name='getSchemaStructure'),
     path('getSchemaData/',views.getSchemaData.as_view(),name='getSchemaData'),
     path('project/',views.projectView.as_view(),name='projectView'),
@@ -27,7 +27,5 @@ urlpatterns = [
     path('dataTypeView/',views.dataTypeView.as_view(),name='dataTypeView'),
     path('alterTableSilver/',views.alterTableSilver.as_view(),name='alterTableSilver'),
     path('checkColumnSilverTable/',views.checkColumnSilverTable.as_view(),name='checkColumnSilverTable'),
-    path('alterTableSilver/',views.alterTableSilver.as_view(),name='alterTableSilver'),
-    path('alterTableSilver/',views.alterTableSilver.as_view(),name='alterTableSilver'),
     path('dataSource/<int:project_id>/<str:data_source>',views.DataSourceView.as_view())
 ]

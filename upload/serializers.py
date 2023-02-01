@@ -69,13 +69,16 @@ class UploadSerializer(serializers.Serializer):
 
 class DataQualityCheckSerializer(serializers.Serializer):
     id=serializers.IntegerField(read_only=True)
-    data_source=serializers.CharField(default=None)
-    column_name=serializers.CharField(default=None)
-    null_check=serializers.BooleanField(default=False)
-    date_check=serializers.BooleanField(default=False)
-    special_character_check=serializers.BooleanField(default=False)
-    string_check=serializers.BooleanField(default=False)
-    integer_check=serializers.BooleanField(default=False)
+    data_source=serializers.CharField()
+    column_name=serializers.CharField()
+    null_check=serializers.BooleanField()
+    date_check=serializers.BooleanField()
+    special_character_check=serializers.BooleanField()
+    string_check=serializers.BooleanField()
+    integer_check=serializers.BooleanField()
+
+class DataQualityArrayCheckSerializer(serializers.Serializer):
+    objects=DataQualityCheckSerializer(many=True)
 
     def create(self, validated_data):
         return DataQualityCheck.objects.create(**validated_data)

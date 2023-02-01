@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from .models import DataQualityCheck, DataSource, DataType, Database, Project, QueryLogs, Upload, filterSymbol
-from .serializers import  DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer, filterSymbolSerializer
+from .serializers import  DataQualityArrayCheckSerializer, DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer, filterSymbolSerializer
 from rest_framework import status,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -92,13 +92,26 @@ class dataQualityCheck(APIView):
         return Response(dataQualitySerializer.data)
 
     def post(self,request):
-        dataQuality_serializer=DataQualityCheckSerializer(data=request.data)
-        if dataQuality_serializer.is_valid():
-            dataQuality_serializer.save()
-            return Response(dataQuality_serializer.data)
+        with connection.cursor() as cursor:
+            fields = set()
+            for item in request.data:
+                fields.update(item.keys())
+            fields = sorted(list(fields))
+            statements = []
+            for item in request.data:
+                values = [f"'{item.get(field, 'NULL')}'" for field in fields]
+                statement = f"INSERT INTO SPOTLIGHT.UPLOAD_DATAQUALITYCHECK ({','.join(fields)}) VALUES ({','.join(['%s'] * len(fields))});"
+                cursor.execute(statement % tuple((values)))
+        return Response("Success!!!")
+
+    # def post(self,request):
+    #     dataQuality_serializer=DataQualityArrayCheckSerializer(data=request.data)
+    #     if dataQuality_serializer.is_valid():
+    #         dataQuality_serializer.save()
+    #         return Response(dataQuality_serializer.data)
         
-        else:
-            Response(dataQuality_serializer.errors)
+    #     else:
+    #         Response(dataQuality_serializer.errors)
 
 class getSchemaStructure(APIView):
     def get(self,request):
