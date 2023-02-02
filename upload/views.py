@@ -1,8 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework.decorators import api_view
-from .models import DataQualityCheck, DataSource, DataType, Database, Project, QueryLogs, Upload, filterSymbol
-from .serializers import  DataQualityArrayCheckSerializer, DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer, filterSymbolSerializer
+from .models import DataQualityCheck, DataSource, DataType, Database, Project, QueryLogs, Upload, filterSymbol, goldLayerData
+from .serializers import  DataQualityArrayCheckSerializer, DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer, filterSymbolSerializer, goldLayerDataSerializer
 from rest_framework import status,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -294,3 +294,12 @@ class silverDataInsert(APIView):
         ret = cur.callproc("proc_check_dataquality",(SILVER_TABLE_NAME,TEMP_SILVER_TABLE_NAME,COLUMN_NAME))
         cur.close()
         return Response(ret)
+
+class goldLayerDataView(APIView):
+    def get(self,request):
+        cur = connection.cursor()
+        sql = "select *  from SPOTLIGHT.UPLOAD_GOLDLAYERDATA"
+        cur.execute(sql)
+        records = cur.fetch_pandas_all().to_json(orient='records')
+        cur.close()
+        return HttpResponse(records)

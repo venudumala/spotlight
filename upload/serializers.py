@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import DataQualityCheck, DataSource, DataType, Database, Project, Upload, filterSymbol
+from .models import DataQualityCheck, DataSource, DataType, Database, Project, Upload, filterSymbol, goldLayerData
 from django.db import models
 
 
@@ -106,3 +106,13 @@ class filterSymbolSerializer(serializers.Serializer):
 
      def create(self, validated_data):
         return filterSymbol.objects.create(**validated_data)
+
+class goldLayerDataSerializer(serializers.Serializer):
+    id=serializers.IntegerField(read_only=True)
+    project_name=models.CharField()
+    data_source=models.CharField()
+    records_inserted=models.CharField()
+    final_data_file_generate=models.CharField()
+
+    def create(self, validated_data):
+        return goldLayerData.objects.create(**validated_data)

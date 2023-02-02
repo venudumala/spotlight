@@ -12,6 +12,7 @@ urlpatterns = [
     path('dataQualityCheck/',views.dataQualityCheck.as_view(),name='dataQualityCheck-create'),
     path('getSchemaStructure/',views.getSchemaStructure.as_view(),name='getSchemaStructure'),
     path('getSchemaData/',views.getSchemaData.as_view(),name='getSchemaData'),
+    path('getGoldLayerData/',views.goldLayerDataView.as_view(),name='goldLayerDataView'),
     path('project/',views.projectView.as_view(),name='projectView'),
     path('silvergoldtransform/',views.silverGoldTransformView.as_view(),name='silvergoldtansform'),
     path('bronzesilvertransform/',views.bronzeSilverTransform.as_view(),name='bronzeSilverTransform'),
