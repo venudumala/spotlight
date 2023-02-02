@@ -18,6 +18,7 @@ urlpatterns = [
     path('bronzeSilverInsert/',views.bronzeSilverInsert.as_view(),name='bronzeSilverInsert'),
     path('getSilverTable/',views.getSilverTable.as_view(),name='getSilverTable'),
     path('getSilverSchemaStructure/',views.getSilverSchemaStructure.as_view(),name='getSilverSchemaStructure'),
+    path('silverDataInsert/',views.silverDataInsert.as_view(),name='silverDataInsert'),
     path('getBronzeTable/',views.getBronzeTable.as_view(),name='getBronzeTable'),
     path('getBronzeSchemaStructure/',views.getBronzeSchemaStructure.as_view(),name='getBronzeSchemaStructure'),
     path('projectwithids/',views.projectDataSourceData.as_view(),name='projectDataSourceViewSet'),

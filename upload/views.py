@@ -97,21 +97,11 @@ class dataQualityCheck(APIView):
             for item in request.data:
                 fields.update(item.keys())
             fields = sorted(list(fields))
-            statements = []
             for item in request.data:
                 values = [f"'{item.get(field, 'NULL')}'" for field in fields]
                 statement = f"INSERT INTO SPOTLIGHT.UPLOAD_DATAQUALITYCHECK ({','.join(fields)}) VALUES ({','.join(['%s'] * len(fields))});"
                 cursor.execute(statement % tuple((values)))
         return Response("Success!!!")
-
-    # def post(self,request):
-    #     dataQuality_serializer=DataQualityArrayCheckSerializer(data=request.data)
-    #     if dataQuality_serializer.is_valid():
-    #         dataQuality_serializer.save()
-    #         return Response(dataQuality_serializer.data)
-        
-    #     else:
-    #         Response(dataQuality_serializer.errors)
 
 class getSchemaStructure(APIView):
     def get(self,request):
@@ -292,3 +282,13 @@ class filterSymbolView(APIView):
         
         else:
             return Response(filterSymbol_serializer.errors)
+
+class silverDataInsert(APIView):
+    def post(self,request):
+        cur = connection.cursor()
+        SILVER_TABLE_NAME=self.request.query_params.get('silver_table_name')
+        TEMP_SILVER_TABLE_NAME="TEMP_"+SILVER_TABLE_NAME
+        COLUMN_NAME=self.request.query_params.get('column_name')
+        ret = cur.callproc("proc_check_dataquality",())
+        cur.close()
+        return Response("Success!!!")
