@@ -149,12 +149,13 @@ class getSilverTable(APIView):
         return Response(records)
 
 class getGoldTable(APIView):
-    def get(self,request):
+    def get(self,request,table_name):
         cur = connection.cursor()
-        sql ="SELECT TABLE_NAME from information_schema.tables where TABLE_SCHEMA='GOLD_LAYER'"
+        sql = "select *  from GOLD_LAYER."+table_name
         cur.execute(sql)
-        records = cur.fetch_pandas_all()
-        return Response(records)
+        records = cur.fetch_pandas_all().to_json(orient='records')
+        cur.close()
+        return HttpResponse(records)
 
 class getSilverSchemaStructure(APIView):
     def get(self,request):
