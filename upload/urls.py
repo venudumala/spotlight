@@ -17,6 +17,7 @@ urlpatterns = [
     path('bronzesilvertransform/',views.bronzeSilverTransform.as_view(),name='bronzeSilverTransform'),
     path('bronzeSilverInsert/',views.bronzeSilverInsert.as_view(),name='bronzeSilverInsert'),
     path('getSilverTable/',views.getSilverTable.as_view(),name='getSilverTable'),
+    path('getGoldTable/',views.getGoldTable.as_view(),name='getGoldTable'),
     path('getSilverSchemaStructure/',views.getSilverSchemaStructure.as_view(),name='getSilverSchemaStructure'),
     path('silverDataInsert/',views.silverDataInsert.as_view(),name='silverDataInsert'),
     path('getBronzeTable/',views.getBronzeTable.as_view(),name='getBronzeTable'),

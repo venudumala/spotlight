@@ -91,3 +91,9 @@ class DataType(models.Model):
 class filterSymbol(models.Model):
     symbol=models.CharField(max_length=10,blank = True,null=True)
     created_at=models.DateTimeField(auto_now=True,blank= True,null=True)
+
+class goldLayerData(models.Model):
+    project_name=models.CharField(max_length=1000,blank = True,null=True)
+    data_source=models.CharField(max_length=1000,blank = True,null=True)
+    records_inserted=models.CharField(max_length=1000,blank = True,null=True)
+    final_data_file_generate=models.CharField(max_length=1000,blank = True,null=True)

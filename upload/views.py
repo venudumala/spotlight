@@ -106,7 +106,7 @@ class dataQualityCheck(APIView):
 class getSchemaStructure(APIView):
     def get(self,request):
         cur = connection.cursor()
-        sql = "select column_name  from SPOTLIGHT.information_schema.columns where table_schema = 'BRONZE_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"'"
+        sql = "select column_name  from SPOTLIGHT.information_schema.columns where table_schema = 'BRONZE_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"' AND column_name NOT LIKE '%_AIRBYTE_%'"
         cur.execute(sql)
         records = cur.fetchall()
         return Response(records)
@@ -143,7 +143,15 @@ class bronzeSilverTransform(APIView):
 class getSilverTable(APIView):
     def get(self,request):
         cur = connection.cursor()
-        sql ="SELECT TABLE_NAME from information_schema.tables where TABLE_SCHEMA='SILVER_LAYER' "
+        sql ="SELECT TABLE_NAME from information_schema.tables where TABLE_SCHEMA='SILVER_LAYER' AND TABLE_NAME NOT LIKE '%TEMP_%'"
+        cur.execute(sql)
+        records = cur.fetch_pandas_all()
+        return Response(records)
+
+class getGoldTable(APIView):
+    def get(self,request):
+        cur = connection.cursor()
+        sql ="SELECT TABLE_NAME from information_schema.tables where TABLE_SCHEMA='GOLD_LAYER'"
         cur.execute(sql)
         records = cur.fetch_pandas_all()
         return Response(records)
@@ -151,7 +159,7 @@ class getSilverTable(APIView):
 class getSilverSchemaStructure(APIView):
     def get(self,request):
         cur = connection.cursor()
-        sql = "select column_name  from SPOTLIGHT.information_schema.columns where table_schema = 'SILVER_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"'"
+        sql = "select column_name  from SPOTLIGHT.information_schema.columns where table_schema = 'SILVER_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"' AND column_name NOT LIKE '%_AIRBYTE_%'"
         cur.execute(sql)
         records = cur.fetchall()
         return Response(records)
@@ -159,16 +167,10 @@ class getSilverSchemaStructure(APIView):
 class silverGoldTransformView(APIView):
     def post(self,request):
         cursor = connection.cursor()
-        SOURCE_TABLE_NAME1=self.request.query_params.get('SOURCE_TABLE_NAME1')
-        SOURCE_TABLE_NAME2=self.request.query_params.get('SOURCE_TABLE_NAME2')
-        TARGET_TABLE_NAME=self.request.query_params.get('TARGET_TABLE_NAME')
-        JOIN_STATEMENT=self.request.query_params.get('JOIN_STATEMENT')
-        FIRST_CLAUSE=self.request.query_params.get('FIRST_CLAUSE')
-        SECOND_CLAUSE=self.request.query_params.get('SECOND_CLAUSE')
+        TABLE_NAME=self.request.query_params.get('TABLE_NAME')
         COLUMNS_NAME=self.request.query_params.get('COLUMNS_NAME')
-        INSERT_COLUMNS_NAME=self.request.query_params.get('INSERT_COLUMNS_NAME')
-        FILTER_COLUMN=self.request.query_params.get('FILTER_COLUMN')
-        ret = cursor.callproc("proc_silver_gold_tansform",(SOURCE_TABLE_NAME1,SOURCE_TABLE_NAME2, TARGET_TABLE_NAME, INSERT_COLUMNS_NAME,COLUMNS_NAME, JOIN_STATEMENT, FIRST_CLAUSE, SECOND_CLAUSE,FILTER_COLUMN))
+        FILTER_CONDITIONS=self.request.query_params.get('FILTER_CONDITIONS')
+        ret = cursor.callproc("PROC_TEMP_SILVER_GOLD_TANSFORM",(TABLE_NAME,COLUMNS_NAME, FILTER_CONDITIONS))
         cursor.close()
         return Response("Success!!!")
 
@@ -223,7 +225,7 @@ class getBronzeTable(APIView):
 class getBronzeSchemaStructure(APIView):
     def get(self,request):
         cur = connection.cursor()
-        sql = "select column_name  from SPOTLIGHT.information_schema.columns where table_schema = 'BRONZE_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"'"
+        sql = "select column_name  from SPOTLIGHT.information_schema.columns where table_schema = 'BRONZE_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"' AND column_name NOT LIKE '%_AIRBYTE_%'"
         cur.execute(sql)
         records = cur.fetchall()
         return Response(records)
@@ -239,7 +241,7 @@ class getBronzeTableData(APIView):
 class checkColumnSilverTable(APIView):
     def get(self,request):
         cur = connection.cursor()
-        sql = "select to_boolean(count(1)) from SPOTLIGHT.information_schema.columns where table_schema = 'SILVER_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"' and COLUMN_NAME='"+self.request.query_params.get('column_name')+"';"
+        sql = "select to_boolean(count(1)) from SPOTLIGHT.information_schema.columns where table_schema = 'SILVER_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"' and COLUMN_NAME='"+self.request.query_params.get('column_name')+"' AND column_name NOT LIKE '%_AIRBYTE_%';"
         cur.execute(sql)
         records = cur.fetchall()
         return Response(records)
