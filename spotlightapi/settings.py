@@ -78,7 +78,7 @@ DATABASES = {
         'WAREHOUSE': 'COMPUTE_WH',
         'USER': 'MaheshKolipaka',
         'PASSWORD': 'M@hesh1234',
-        'ACCOUNT': 'nfyczpe-yq49101'
+        'ACCOUNT': 'jmzwjrj-jx02700'
     },
 }
 

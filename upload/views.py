@@ -40,6 +40,18 @@ class projectView(APIView):
         else:
             return Response(project_serializer.errors)
 
+class createTableView(APIView):
+    def post(self,request):
+        cursor = connection.cursor()
+        DB_NAME="SPOTLIGHT"
+        SCHEMA_NAME="SPOTLIGHT"
+        TABLE_NAME=self.request.query_params.get('table_name')
+        COLUMN_NAME=self.request.query_params.get('column_name')
+        ret = cursor.callproc("proc_create_table",(DB_NAME,SCHEMA_NAME,TABLE_NAME,COLUMN_NAME))
+        cursor.close()
+        return Response("Success!!!")
+
+
 class DataSourceView(APIView):
     def get(self,request):
         data_source=DataSource.objects.all()
