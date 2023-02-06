@@ -4,8 +4,11 @@ from django.db import models
 
 
 class DatabaseSerializer(serializers.Serializer):
-    id=serializers.IntegerField(read_only=True)
-    database_name=serializers.BooleanField(default=None)
+    # id=serializers.IntegerField(read_only=True)
+    # database_name=serializers.BooleanField(default=None)
+    class Meta:
+        model = Database
+        fields = ('id','database_name')
 
     def create(self, validated_data):
         return Database.objects.create(**validated_data)
@@ -16,12 +19,10 @@ class DatabaseSerializer(serializers.Serializer):
         return instance
 
 
-class ProjectSerializer(serializers.Serializer):
-    id=serializers.IntegerField(read_only=True)
-    project_id=serializers.IntegerField(read_only=True)
-    project_name=serializers.CharField(default=None)
-    user_name=serializers.CharField(default=None)
-    description=serializers.CharField(default=None)
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ('id','project_name','user_name','description')
 
     def create(self, validated_data):
         return Project.objects.create(**validated_data)
