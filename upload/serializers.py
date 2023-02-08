@@ -45,7 +45,7 @@ class DataSourceSerializer(serializers.ModelSerializer):
 class UploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Upload
-        fields = ('id','record_id','project_name','file','file_name','file_type','upoload_layer','dump_layer','transformation_layer','records_inserted','valid_file_path','updated_at')
+        fields = "__all__"
 
     def create(self, validated_data):
         return Upload.objects.create(**validated_data)
@@ -59,41 +59,37 @@ class UploadSerializer(serializers.ModelSerializer):
 class DataQualityCheckSerializer(serializers.ModelSerializer):
     class Meta:
         model = DataQualityCheck
-        fields = ('id','data_source','column_name','null_check','date_check','special_character_check','string_check','integer_check')
+        fields = "__all__"
 
     def create(self, validated_data):
         return DataQualityCheck.objects.create(**validated_data)
 
 
 class QueryLogsSerializer(serializers.Serializer):
-    id=serializers.IntegerField(read_only=True)
-    data_source=serializers.IntegerField()
-    project_id=serializers.IntegerField()
-    query_statement=serializers.IntegerField()
-    target_table=serializers.IntegerField()
-    created_at=models.DateTimeField(auto_now_add=True)
+    class Meta:
+        model = DataQualityCheck
+        fields = "__all__"
 
 class DataTypeSerializer(serializers.Serializer):
-    id=serializers.IntegerField(read_only=True)
-    datatype=serializers.CharField()
-    created_at=models.DateTimeField(auto_now_add=True)
+    class Meta:
+        model = DataType
+        fields = "__all__"
 
     def create(self, validated_data):
         return DataType.objects.create(**validated_data)
 
 class filterSymbolSerializer(serializers.Serializer):
-     id=serializers.IntegerField(read_only=True)
-     symbol=serializers.CharField(default=None)
+    class Meta:
+        model = filterSymbol
+        fields = "__all__"
 
-     def create(self, validated_data):
+    def create(self, validated_data):
         return filterSymbol.objects.create(**validated_data)
 
 class goldLayerDataSerializer(serializers.Serializer):
-    id=serializers.IntegerField(read_only=True)
-    project_name=models.CharField()
-    data_source=models.CharField()
-    records_inserted=models.CharField()
-    final_data_file_generate=models.CharField()
+    class Meta:
+        model = goldLayerData
+        fields = "__all__"
 
     def create(self, validated_data):
         return goldLayerData.objects.create(**validated_data)
