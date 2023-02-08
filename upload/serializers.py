@@ -3,9 +3,7 @@ from .models import DataQualityCheck, DataSource, DataType, Database, Project, U
 from django.db import models
 
 
-class DatabaseSerializer(serializers.Serializer):
-    # id=serializers.IntegerField(read_only=True)
-    # database_name=serializers.BooleanField(default=None)
+class DatabaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Database
         fields = ('id','database_name')
@@ -17,7 +15,6 @@ class DatabaseSerializer(serializers.Serializer):
         instance.database_name=validated_data.get('database_name',instance.database_name)
         instance.save()
         return instance
-
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
@@ -45,19 +42,10 @@ class DataSourceSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-class UploadSerializer(serializers.Serializer):
-    id=serializers.IntegerField(read_only=True)
-    record_id=serializers.IntegerField(read_only=True)
-    project_name=serializers.CharField(default=None)
-    file=serializers.FileField(default=None)
-    file_name=serializers.CharField(default=None)
-    file_type=serializers.CharField(default=None)
-    upoload_layer=serializers.BooleanField(default=True)
-    dump_layer=serializers.BooleanField(default=False)
-    transformation_layer=serializers.BooleanField(default=False)
-    records_inserted=serializers.CharField(default=None)
-    valid_file_path=serializers.CharField(default=None)
-    updated_at=serializers.CharField(default=None)
+class UploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Upload
+        fields = ('id','record_id','project_name','file','file_name','file_type','upoload_layer','dump_layer','transformation_layer','records_inserted','valid_file_path','updated_at')
 
     def create(self, validated_data):
         return Upload.objects.create(**validated_data)
@@ -68,18 +56,10 @@ class UploadSerializer(serializers.Serializer):
         instance.save()
         return instance
 
-class DataQualityCheckSerializer(serializers.Serializer):
-    id=serializers.IntegerField(read_only=True)
-    data_source=serializers.CharField()
-    column_name=serializers.CharField()
-    null_check=serializers.BooleanField()
-    date_check=serializers.BooleanField()
-    special_character_check=serializers.BooleanField()
-    string_check=serializers.BooleanField()
-    integer_check=serializers.BooleanField()
-
-class DataQualityArrayCheckSerializer(serializers.Serializer):
-    objects=DataQualityCheckSerializer(many=True)
+class DataQualityCheckSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DataQualityCheck
+        fields = ('id','data_source','column_name','null_check','date_check','special_character_check','string_check','integer_check')
 
     def create(self, validated_data):
         return DataQualityCheck.objects.create(**validated_data)
