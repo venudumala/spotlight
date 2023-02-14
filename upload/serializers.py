@@ -32,7 +32,8 @@ class ProjectSerializer(serializers.ModelSerializer):
 class DataSourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = DataSource
-        fields = ('id','project_id','data_source','table_records','total_records','final_data_file_generate','created_at','updated_at')
+        # fields = ('id','project_id','data_source','table_records','total_records','final_data_file_generate','created_at','updated_at')
+        fields ="__all__"
 
     def create(self, validated_data):
         return DataSource.objects.create(**validated_data)
@@ -41,6 +42,13 @@ class DataSourceSerializer(serializers.ModelSerializer):
         instance.project_id=validated_data.get('project_id',instance.project_id)
         instance.save()
         return instance
+        
+class projectDataSourceDataSerializer(serializers.ModelSerializer):
+    data_source_list=DataSourceSerializer(many=True,read_only=True)
+
+    class Meta:
+        model = Project
+        fields = "__all__"
 
 class UploadSerializer(serializers.ModelSerializer):
     class Meta:
@@ -93,3 +101,4 @@ class goldLayerDataSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return goldLayerData.objects.create(**validated_data)
+

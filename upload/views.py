@@ -1,8 +1,6 @@
 from django.http import HttpResponse
-from django.shortcuts import render
-from rest_framework.decorators import api_view
 from .models import DataQualityCheck, DataSource, DataType, Database, Project, QueryLogs, Upload, filterSymbol, goldLayerData
-from .serializers import DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer, filterSymbolSerializer, goldLayerDataSerializer
+from .serializers import DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer, filterSymbolSerializer, goldLayerDataSerializer, projectDataSourceDataSerializer
 from rest_framework import status,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -141,6 +139,7 @@ class projectDataSourceData(APIView):
         cur.execute(sql)
         records = cur.fetch_pandas_all().to_json(orient='records')
         return Response(records)
+
 
 class bronzeSilverTransform(APIView):
     def post(self,request):

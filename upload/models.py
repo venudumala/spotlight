@@ -1,5 +1,6 @@
 import datetime,uuid
 from django.db import models
+from django.contrib.auth.models import User
 
 class Database(models.Model):
     id=models.IntegerField(primary_key=True,auto_created=True,default=1)
@@ -29,7 +30,7 @@ class DataSource(models.Model):
     def __str__(self):
         return self.data_source
 
-
+        
 class Upload(models.Model):
     project_name=models.CharField(max_length=100,default=None,null=True)
     record_id=models.UUIDField(default=uuid.uuid4,editable = False,unique=True,max_length=100,null=True)
