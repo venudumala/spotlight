@@ -4,7 +4,11 @@ from rest_framework.authtoken.models import Token
 from user_app.api.serializers import registrationSerializer
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework_jwt.settings import api_settings
+from rest_framework.permissions import AllowAny
+from django.contrib.auth import authenticate
 
 @api_view(['POST',])
 def registration_view(request):
@@ -36,4 +40,22 @@ def logout_view(request):
         return Response(status=status.HTTP_200_OK)
     else:
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+class LoginView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        user = authenticate(username=username, password=password)
+        if user:
+            payload = api_settings.JWT_PAYLOAD_HANDLER(user)
+            token = api_settings.JWT_ENCODE_HANDLER(payload)
+            return Response({'token': token,'username':user.username,'email':user.email})
+        else:
+            return Response({'error': 'Invalid Credentials'}, status=400)
+
 

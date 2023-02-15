@@ -6,9 +6,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db import connection
 import pandas as pd
-from rest_framework.generics import ListAPIView
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 class databaseView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         database=Database.objects.all()
         databaseserializer=DatabaseSerializer(database,many=True)
@@ -24,6 +27,8 @@ class databaseView(APIView):
             return Response(database_serializer.errors)
 
 class projectView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         project=Project.objects.all()
         projectserializer=ProjectSerializer(project,many=True)
@@ -39,6 +44,8 @@ class projectView(APIView):
             return Response(project_serializer.errors)
 
 class createTableView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def post(self,request):
         cursor = connection.cursor()
         DB_NAME="SPOTLIGHT"
@@ -51,6 +58,8 @@ class createTableView(APIView):
 
 
 class DataSourceView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         data_source=DataSource.objects.all()
         datasourceserializer=DataSourceSerializer(data_source,many=True)
@@ -63,6 +72,8 @@ class DataSourceView(APIView):
         return Response("Success!!!")
 
 class uploadView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         uploads=Upload.objects.all()
         uploadserializer=UploadSerializer(uploads,many=True)
@@ -81,6 +92,8 @@ class uploadView(APIView):
             Response(insert_serializer.errors)
 
 class UploadLayerView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request,pk):
         get_uploaded_data=Upload.objects.get(pk=pk)
         get_uploaded_serializer=UploadSerializer(get_uploaded_data)
@@ -96,6 +109,8 @@ class UploadLayerView(APIView):
             return Response(update_serializer.errors)
 
 class dataQualityCheck(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         dataQuality=DataQualityCheck.objects.all()
         dataQualitySerializer=DataQualityCheckSerializer(dataQuality,many=True)
@@ -114,6 +129,8 @@ class dataQualityCheck(APIView):
         return Response("Success!!!")
 
 class getSchemaStructure(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         cur = connection.cursor()
         sql = "select column_name  from SPOTLIGHT.information_schema.columns where table_schema = 'BRONZE_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"' AND column_name NOT LIKE '%_AIRBYTE_%'"
@@ -122,6 +139,8 @@ class getSchemaStructure(APIView):
         return Response(records)
 
 class getSchemaData(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         cur = connection.cursor()
         string1=self.request.query_params.get('columns_name').replace("'",'')
@@ -133,6 +152,8 @@ class getSchemaData(APIView):
         return Response(records)
 
 class projectDataSourceData(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         cur = connection.cursor()
         sql = "select pr.PROJECT_NAME, pr.USER_NAME, pr.DESCRIPTION,ds.DATA_SOURCE, ds.TABLE_RECORDS, ds.TOTAL_RECORDS,ds.FINAL_DATA_FILE_GENERATE from SPOTLIGHT.SPOTLIGHT.UPLOAD_PROJECT as pr inner join SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE as ds on pr.id =ds.project_id where pr.id="+self.request.query_params.get('project_id')
@@ -142,6 +163,8 @@ class projectDataSourceData(APIView):
 
 
 class bronzeSilverTransform(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def post(self,request):
         cur = connection.cursor()
         string1=self.request.query_params.get('columns_name').replace("'",'')
@@ -152,6 +175,8 @@ class bronzeSilverTransform(APIView):
         return Response("Success!!!")
 
 class getSilverTable(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         cur = connection.cursor()
         sql ="SELECT TABLE_NAME from information_schema.tables where TABLE_SCHEMA='SILVER_LAYER' AND TABLE_NAME NOT LIKE '%TEMP_%'"
@@ -160,6 +185,8 @@ class getSilverTable(APIView):
         return Response(records)
 
 class getGoldTable(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request,table_name):
         cur = connection.cursor()
         sql = "select *  from GOLD_LAYER."+table_name
@@ -169,6 +196,8 @@ class getGoldTable(APIView):
         return HttpResponse(records)
 
 class getSilverSchemaStructure(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         cur = connection.cursor()
         sql = "select column_name  from SPOTLIGHT.information_schema.columns where table_schema = 'SILVER_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"' AND column_name NOT LIKE '%_AIRBYTE_%'"
@@ -177,6 +206,8 @@ class getSilverSchemaStructure(APIView):
         return Response(records)
 
 class silverGoldTransformView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def post(self,request):
         cursor = connection.cursor()
         TABLE_NAME=self.request.query_params.get('TABLE_NAME')
@@ -187,6 +218,8 @@ class silverGoldTransformView(APIView):
         return Response("Success!!!")
 
 class bronzeSilverInsert(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def post(self,request):
         cur = connection.cursor()
         SOURCE_TABLE_NAME1=self.request.query_params.get('SOURCE_TABLE_NAME1')
@@ -203,6 +236,8 @@ class bronzeSilverInsert(APIView):
         return Response("Success!!!")
 
 class getSilverTableData(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request,table_name):
         cur = connection.cursor()
         sql = "select *  from SILVER_LAYER."+table_name
@@ -212,6 +247,10 @@ class getSilverTableData(APIView):
         return Response(records)
 
 class QueryLogsView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         querylogs=QueryLogs.objects.all()
         querylogsserializer=QueryLogsSerializer(querylogs,many=True)
@@ -227,6 +266,8 @@ class QueryLogsView(APIView):
             return Response(querylogs_serializer.errors)
 
 class getBronzeTable(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         cur = connection.cursor()
         sql ="Select UPPER(DATA_SOURCE) as DATA_SOURCE from SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE where PROJECT_ID="+self.request.query_params.get('project_id')
@@ -235,6 +276,8 @@ class getBronzeTable(APIView):
         return Response(records)
 
 class getBronzeSchemaStructure(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         cur = connection.cursor()
         sql = "select column_name  from SPOTLIGHT.information_schema.columns where table_schema = 'BRONZE_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"' AND column_name NOT LIKE '%_AIRBYTE_%'"
@@ -243,6 +286,8 @@ class getBronzeSchemaStructure(APIView):
         return Response(records)
 
 class getBronzeTableData(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request,table_name):
         cur = connection.cursor()
         sql = "select *  from BRONZE_LAYER."+table_name
@@ -251,6 +296,8 @@ class getBronzeTableData(APIView):
         return HttpResponse(records)
 
 class checkColumnSilverTable(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         cur = connection.cursor()
         sql = "select to_boolean(count(1)) from SPOTLIGHT.information_schema.columns where table_schema = 'SILVER_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"' and COLUMN_NAME='"+self.request.query_params.get('column_name')+"' AND column_name NOT LIKE '%_AIRBYTE_%';"
@@ -259,6 +306,8 @@ class checkColumnSilverTable(APIView):
         return Response(records)
 
 class alterTableSilver(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         cur = connection.cursor()
         sql = "Alter TABLE SPOTLIGHT.SILVER_LAYER."+self.request.query_params.get('table_name')+" ADD "+self.request.query_params.get('column_name')+" "+self.request.query_params.get('data_type')
@@ -268,6 +317,8 @@ class alterTableSilver(APIView):
         return Response(records)
 
 class dataTypeView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         database=DataType.objects.all()
         databaseserializer=DataTypeSerializer(database,many=True)
@@ -283,6 +334,8 @@ class dataTypeView(APIView):
             return Response(database_serializer.errors)
 
 class filterSymbolView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         filterSymbol=filterSymbol.objects.all()
         filterSymbolserializer=filterSymbolSerializer(filterSymbol,many=True)
@@ -298,6 +351,8 @@ class filterSymbolView(APIView):
             return Response(filterSymbol_serializer.errors)
 
 class silverDataInsert(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def post(self,request):
         cur = connection.cursor()
         SILVER_TABLE_NAME=self.request.query_params.get('silver_table_name')
@@ -308,6 +363,8 @@ class silverDataInsert(APIView):
         return Response(ret)
 
 class goldLayerDataView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         cur = connection.cursor()
         sql = "select *  from SPOTLIGHT.UPLOAD_GOLDLAYERDATA"
