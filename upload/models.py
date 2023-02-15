@@ -1,6 +1,6 @@
 import datetime,uuid
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User 
 
 class Database(models.Model):
     id=models.IntegerField(primary_key=True,auto_created=True,default=1)
