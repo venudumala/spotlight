@@ -12,6 +12,7 @@ from django.contrib.auth import authenticate
 
 @api_view(['POST',])
 def registration_view(request):
+    permission_classes = [AllowAny] 
     if request.method=='POST':
         registration_serializer=registrationSerializer(data=request.data)
         data={}
@@ -54,7 +55,7 @@ class LoginView(APIView):
         if user:
             payload = api_settings.JWT_PAYLOAD_HANDLER(user)
             token = api_settings.JWT_ENCODE_HANDLER(payload)
-            return Response({'token': token,'username':user.username,'email':user.email})
+            return Response({'userId':user.id,'username':user.username,'email':user.email,'token': token,})
         else:
             return Response({'error': 'Invalid Credentials'}, status=400)
 

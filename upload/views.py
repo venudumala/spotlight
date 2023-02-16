@@ -8,6 +8,8 @@ from django.db import connection
 import pandas as pd
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+import jwt
+
 
 class databaseView(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
@@ -30,7 +32,10 @@ class projectView(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self,request):
-        project=Project.objects.all()
+        # token = request.data.get('token')
+        user_id = request.user.id
+        # user_name = request.user.username
+        project=Project.objects.filter(user_id=user_id)
         projectserializer=ProjectSerializer(project,many=True)
         return Response(projectserializer.data)
 
@@ -372,3 +377,16 @@ class goldLayerDataView(APIView):
         records = cur.fetch_pandas_all().to_json(orient='records')
         cur.close()
         return HttpResponse(records)
+
+class projectTempView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        try:
+           token = request.data.get('token')
+           user_id = request.user.id
+           user_name = request.user.username
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({'message': f'Hello, {user_name}! Your user ID is {user_id}'})

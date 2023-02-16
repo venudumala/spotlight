@@ -11,7 +11,7 @@ class Database(models.Model):
 
 class Project(models.Model):
     project_name=models.CharField(max_length=100,blank=True,unique=True,null=True)
-    user_name=models.CharField(max_length=100,blank=True,null=True)
+    user_id=models.IntegerField()
     description=models.CharField(max_length=100,blank=True,null=True)
     created_at=models.DateTimeField(auto_now_add=True,blank=True,null=True)
 
