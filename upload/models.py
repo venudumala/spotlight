@@ -98,3 +98,18 @@ class goldLayerData(models.Model):
     data_source=models.CharField(max_length=1000,blank = True,null=True)
     records_inserted=models.CharField(max_length=1000,blank = True,null=True)
     final_data_file_generate=models.CharField(max_length=1000,blank = True,null=True)
+
+class Audit(models.Model):
+  UID=models.UUIDField(primary_key=True,auto_created=True,default=uuid.uuid4,editable=False)
+  PROJECT_ID=models.IntegerField(default=None)
+  DATASOURCE=models.CharField(max_length=500,default=None)
+  OPERATION=models.CharField(max_length=20,default=None)
+  CREATED_BY=models.CharField(max_length=100,null=True)
+  CREATED_AT=models.DateTimeField(auto_now_add=True,null=True)
+  CALLED_FUNCTION_NAME=models.CharField(max_length=200,null=True)
+  LAYER=models.CharField(max_length=200,default=None,null=True)
+  TABLE_NAME=models.CharField(max_length=200,default=None,null=True)
+  STATUS=models.CharField(max_length=10,default=None,null=True)
+  MESSAGE=models.CharField(max_length=500,default=None,null=True)
+  def __str__(self):
+    return self.OPERATION
