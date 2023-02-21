@@ -59,6 +59,7 @@ CORS_ALLOW_HEADERS = [
     "x-csrftoken",
     "x-requested-with",
 ]
+CORS_ALLOW_CREDENTIALS = True
 
 TEMPLATES = [
     {
