@@ -43,33 +43,39 @@ class projectView(APIView):
 
     def post(self,request):
         try:
+            guid = request.data.get('guid')
             project_serializer=ProjectSerializer(data=request.data)
             if project_serializer.is_valid():
                 project_serializer.save()
-                auditLogs("-","-","Project Creation","Post Project Creation","-","Project","Success","Project has been created",request.user.username,datetime.datetime.now())
+                auditLogs("-","-","Project Creation","Post Project Creation","-","Project","Success","Project has been created",request.user.username,datetime.datetime.now(),guid)
                 return Response(project_serializer.data)
             
             
             else:
-                auditLogs("-","-","Project Creation","Post Project Creation","-","Project","Success","Project has been created",request.user.username,datetime.datetime.now())
+                auditLogs("-","-","Project Creation","Post Project Creation","-","Project","Success","Project has been created",request.user.username,datetime.datetime.now(),guid)
                 return Response(project_serializer.errors)
         except Exception as e:
-            auditLogs("-","-","Project Creation","Post Project Failed","-","Project","Failed",'error'+" "+str(e),request.user.username)
+            auditLogs("-","-","Project Creation","Post Project Failed","-","Project","Failed",'error'+" "+str(e),request.user.username,request.user.username,datetime.datetime.now(),guid)
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class createTableView(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
     permission_classes = [IsAuthenticated]
     def post(self,request):
-        cursor = connection.cursor()
-        DB_NAME="SPOTLIGHT"
-        SCHEMA_NAME="SPOTLIGHT"
-        TABLE_NAME=self.request.query_params.get('table_name')
-        COLUMN_NAME=self.request.query_params.get('column_name')
-        ret = cursor.callproc("proc_create_table",(DB_NAME,SCHEMA_NAME,TABLE_NAME,COLUMN_NAME))
-        cursor.close()
-        return Response("Success!!!")
-
+        try:
+            guid = request.data.get('guid')
+            cursor = connection.cursor()
+            DB_NAME="SPOTLIGHT"
+            SCHEMA_NAME="SPOTLIGHT"
+            TABLE_NAME=self.request.query_params.get('table_name')
+            COLUMN_NAME=self.request.query_params.get('column_name')
+            ret = cursor.callproc("proc_create_table",(DB_NAME,SCHEMA_NAME,TABLE_NAME,COLUMN_NAME))
+            cursor.close()
+            project_id = request.session.get('project_id')
+            auditLogs(project_id,"-","Project Creation","Post Project Creation","-","Project","Success","Project has been created",request.user.username,datetime.datetime.now(),guid)
+            return Response("Success!!!")
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class DataSourceView(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
@@ -84,13 +90,15 @@ class DataSourceView(APIView):
 
     def post(self,request,project_id,data_source):
         try:
+            guid = request.data.get('guid')
             cursor = connection.cursor()
             cursor.callproc("proc_create_datasource",(project_id,data_source))
             cursor.close()
-            auditLogs("-","-","Data Source Creation","Post Data Source Creation","-","Data Source","Success","Data Source has been created",request.user.username,datetime.datetime.now())
+            project_ids = request.session.get('project_id')
+            auditLogs(project_ids,data_source,"Data Source Creation","Post Data Source Creation","-","Data Source","Success","Data Source has been created",request.user.username,datetime.datetime.now(),guid)
             return Response("Success!!!")
         except Exception as e:
-            auditLogs("-","-","Data Source Creation","Post Data Source Creation","-","Data Source","Failed",'error'+" "+str(e),request.user.username,datetime.datetime.now())
+            auditLogs(project_id,"-","Data Source Creation","Post Data Source Creation","-","Data Source","Failed",'error'+" "+str(e),request.user.username,datetime.datetime.now(),guid)
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
 
@@ -107,14 +115,16 @@ class uploadView(APIView):
 
     def post(self,request):
         try:
+            guid = request.data.get('guid')
             insert_serializer=UploadSerializer(data=request.data)
             if insert_serializer.is_valid():
                 insert_serializer.save()
                 cursor = connection.cursor()
                 ret = cursor.callproc("proc_schema_data",())
                 cursor.close()
+                project_id = request.session.get('project_id')
+                auditLogs(project_id,"-","Data Source Creation","Post Data Source Creation","-","Data Source","Failed",'error'+" "+str(e),request.user.username,datetime.datetime.now(),guid)
                 return Response(insert_serializer.data)
-            
             else:
                 Response(insert_serializer.errors)
         except Exception as e:
@@ -133,10 +143,13 @@ class UploadLayerView(APIView):
 
     def put(self,request,pk):
         try:
+            guid = request.data.get('guid')
             get_uploaded_data=Upload.objects.get(pk=pk)
             update_serializer=UploadSerializer(get_uploaded_data,data=request.data)
             if update_serializer.is_valid():
                 update_serializer.save()
+                project_id = request.session.get('project_id')
+                auditLogs(project_id,"-","Data Source Creation","Post Data Source Creation","-","Data Source","Failed",'error'+" "+str(e),request.user.username,datetime.datetime.now(),guid)
                 return Response(update_serializer.data)
             else:
                 return Response(update_serializer.errors)
@@ -156,6 +169,7 @@ class dataQualityCheck(APIView):
 
     def post(self,request):
         try:
+            guid = request.data.get('guid')
             with connection.cursor() as cursor:
                 fields = set()
                 for item in request.data:
@@ -165,6 +179,7 @@ class dataQualityCheck(APIView):
                     values = [f"'{item.get(field, 'NULL')}'" for field in fields]
                     statement = f"INSERT INTO SPOTLIGHT.UPLOAD_DATAQUALITYCHECK ({','.join(fields)}) VALUES ({','.join(['%s'] * len(fields))});"
                     cursor.execute(statement % tuple((values)))
+            auditLogs(request.session.get('project_id'),"-","Data Source Creation","Post Data Source Creation","-","Data Source","Failed",'error'+" "+str(e),request.user.username,datetime.datetime.now(),guid)
             return Response("Success!!!")
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -203,6 +218,7 @@ class projectDataSourceData(APIView):
     permission_classes = [IsAuthenticated]
     def get(self,request):
         try:
+            request.session['project_id'] =self.request.query_params.get('project_id')
             cur = connection.cursor()
             sql = "select pr.PROJECT_NAME, pr.user_id, pr.DESCRIPTION,ds.DATA_SOURCE, ds.TABLE_RECORDS, ds.TOTAL_RECORDS,ds.FINAL_DATA_FILE_GENERATE from SPOTLIGHT.SPOTLIGHT.UPLOAD_PROJECT as pr inner join SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE as ds on pr.id =ds.project_id where pr.id="+self.request.query_params.get('project_id')
             cur.execute(sql)
@@ -217,6 +233,7 @@ class bronzeSilverTransform(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request):
         try:
+            guid = request.data.get('guid')
             cur = connection.cursor()
             string1=self.request.query_params.get('columns_name').replace("'",'')
             string2=string1.replace('[','')
@@ -272,6 +289,7 @@ class silverGoldTransformView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request):
         try:
+            guid = request.data.get('guid')
             cursor = connection.cursor()
             TABLE_NAME=self.request.query_params.get('TABLE_NAME')
             COLUMNS_NAME=self.request.query_params.get('COLUMNS_NAME')
@@ -287,6 +305,7 @@ class bronzeSilverInsert(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request):
         try:
+            guid = request.data.get('guid')
             cur = connection.cursor()
             SOURCE_TABLE_NAME1=self.request.query_params.get('SOURCE_TABLE_NAME1')
             SOURCE_TABLE_NAME2=self.request.query_params.get('SOURCE_TABLE_NAME2')
@@ -330,6 +349,7 @@ class QueryLogsView(APIView):
 
     def post(self,request):
         try:
+            guid = request.data.get('guid')
             querylogs_serializer=ProjectSerializer(data=request.data)
             if querylogs_serializer.is_valid():
                 querylogs_serializer.save()
@@ -419,6 +439,7 @@ class dataTypeView(APIView):
 
     def post(self,request):
         try:
+            guid = request.data.get('guid')
             database_serializer=DataTypeSerializer(data=request.data)
             if database_serializer.is_valid():
                 database_serializer.save()
@@ -442,6 +463,7 @@ class filterSymbolView(APIView):
 
     def post(self,request):
         try:
+            guid = request.data.get('guid')
             filterSymbol_serializer=filterSymbolSerializer(data=request.data)
             if filterSymbol_serializer.is_valid():
                 filterSymbol_serializer.save()
@@ -456,6 +478,7 @@ class silverDataInsert(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request):
         try:
+            guid = request.data.get('guid')
             cur = connection.cursor()
             SILVER_TABLE_NAME=self.request.query_params.get('silver_table_name')
             TEMP_SILVER_TABLE_NAME="TEMP_"+SILVER_TABLE_NAME
@@ -494,11 +517,11 @@ class projectTempView(APIView):
         return Response({'message': f'Hello, {user_name}! Your user ID is {user_id}'})
     
 # CFunction to log the message 
-def auditLogs(PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_NAME,STATUS,MESSAGE,LOGINUSER,CREATED_AT):
+def auditLogs(PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_NAME,STATUS,MESSAGE,LOGINUSER,CREATED_AT,GUID):
     try:
     #define cursor 
         cursor = connection.cursor()
-        statement =  f"insert into UPLOAD_AUDIT(PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_NAME,STATUS,MESSAGE,CREATED_BY,UID,CREATED_AT) values('{PROJECT_ID}','{DATASOURCE}','{OPERATION}','{CALLED_FUNCTION_NAME}','{LAYER}','{TABLE_NAME}','{STATUS}','{MESSAGE}','{LOGINUSER}','-',{CREATED_AT})"
+        statement =  f"insert into UPLOAD_AUDIT(PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_NAME,STATUS,MESSAGE,CREATED_BY,UID,CREATED_AT) values('{PROJECT_ID}','{DATASOURCE}','{OPERATION}','{CALLED_FUNCTION_NAME}','{LAYER}','{TABLE_NAME}','{STATUS}','{MESSAGE}','{LOGINUSER}','{GUID}',{CREATED_AT})"
         print(statement)
         cursor.execute(statement)
         cursor.close()

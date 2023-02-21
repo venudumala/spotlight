@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework_jwt.settings import api_settings
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import authenticate
+import uuid
 
 @api_view(['POST',])
 def registration_view(request):
@@ -55,7 +56,8 @@ class LoginView(APIView):
         if user:
             payload = api_settings.JWT_PAYLOAD_HANDLER(user)
             token = api_settings.JWT_ENCODE_HANDLER(payload)
-            return Response({'userId':user.id,'username':user.username,'email':user.email,'token': token,})
+            guid=str(user.id)+"_"+uuid.uuid4().hex
+            return Response({'userId':user.id,'username':user.username,'email':user.email,'token': token,'guid':guid})
         else:
             return Response({'error': 'Invalid Credentials'}, status=400)
 
