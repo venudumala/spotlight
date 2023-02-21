@@ -46,8 +46,19 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'spotlightapi.urls'
 
-CORS_ALLOWED_ORIGINS = ["http://20.121.247.196:80"]
+CORS_ALLOWED_ORIGINS = ["http://20.121.247.196:80","http://20.121.247.196"]
 CORS_ALLOW_METHODS = ["DELETE", "GET", "PATCH","POST","PUT"] 
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
 
 TEMPLATES = [
     {
