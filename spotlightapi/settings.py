@@ -13,7 +13,7 @@ SECRET_KEY = 'django-insecure-mh__#y)t&g^^bznssxv4&z5*$(mnpvyz5)j-v&row@9a9@(h0y
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["http://20.121.247.196/","http://20.121.247.196:80"]
 
 
 # Application definition
@@ -45,7 +45,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'spotlightapi.urls'
-CORS_ORIGIN_ALLOW_ALL = True 
+CORS_ALLOW_METHODS = ["DELETE", "GET", "PATCH","POST","PUT"] 
 
 TEMPLATES = [
     {
