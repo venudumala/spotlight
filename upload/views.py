@@ -148,7 +148,7 @@ class UploadLayerView(APIView):
             if update_serializer.is_valid():
                 update_serializer.save()
                 project_id = request.session.get('project_id')
-                auditLogs(project_id,"-","Data Source Creation","Post Data Source Creation","-","Data Source","Failed",'error'+" "+str(e),request.user.username,'current_timestamp()',guid)
+                auditLogs(project_id,"0","Data Source Creation","Post Data Source Creation","","Data Source","Failed",'error'+" "+str(e),request.user.username,'current_timestamp()',guid)
                 return Response(update_serializer.data)
             else:
                 return Response(update_serializer.errors)
@@ -178,7 +178,7 @@ class dataQualityCheck(APIView):
                     values = [f"'{item.get(field, 'NULL')}'" for field in fields]
                     statement = f"INSERT INTO SPOTLIGHT.UPLOAD_DATAQUALITYCHECK ({','.join(fields)}) VALUES ({','.join(['%s'] * len(fields))});"
                     cursor.execute(statement % tuple((values)))
-            auditLogs(request.session.get('project_id'),"-","Data Source Creation","Post Data Source Creation","-","Data Source","Failed",'error'+" "+str(e),request.user.username,'current_timestamp()',guid)
+            auditLogs(request.session.get('project_id'),"-","Data Quality Creation","Post Data Quality Creation","-","Data Quality","Failed",'error'+" "+str(e),request.user.username,'current_timestamp()',guid)
             return Response("Success!!!")
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
