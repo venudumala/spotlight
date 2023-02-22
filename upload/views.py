@@ -1,4 +1,5 @@
 import datetime
+import json
 from django.http import HttpResponse
 from .models import DataQualityCheck, DataSource, DataType, Database, Project, QueryLogs, Upload, filterSymbol, goldLayerData
 from .serializers import DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer, filterSymbolSerializer, goldLayerDataSerializer, projectDataSourceDataSerializer
@@ -43,19 +44,17 @@ class projectView(APIView):
 
     def post(self,request):
         try:
-            guid = request.data.get('guid')
+            guid = request.user.guid
             project_serializer=ProjectSerializer(data=request.data)
             if project_serializer.is_valid():
                 project_serializer.save()
-                auditLogs("-","-","Project Creation","Post Project Creation","-","Project","Success","Project has been created",request.user.username,datetime.datetime.now(),guid)
+                auditLogs("0","0","Project Creation","Post Project Creation","","Project","Success","Project has been created",request.user.username,'current_timestamp()',guid)
                 return Response(project_serializer.data)
-            
-            
             else:
-                auditLogs("-","-","Project Creation","Post Project Creation","-","Project","Success","Project has been created",request.user.username,datetime.datetime.now(),guid)
+                auditLogs("0","0","Project Creation","Post Project Creation","","Project","Success","Project has been created",request.user.username,'current_timestamp()',guid)
                 return Response(project_serializer.errors)
         except Exception as e:
-            auditLogs("-","-","Project Creation","Post Project Failed","-","Project","Failed",'error'+" "+str(e),request.user.username,request.user.username,datetime.datetime.now(),guid)
+            auditLogs("0","0","Project Creation","Post Project Failed","-","Project","Failed",'error'+" "+str(e),request.user.username,request.user.username,'current_timestamp()',guid)
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class createTableView(APIView):
@@ -72,7 +71,7 @@ class createTableView(APIView):
             ret = cursor.callproc("proc_create_table",(DB_NAME,SCHEMA_NAME,TABLE_NAME,COLUMN_NAME))
             cursor.close()
             project_id = request.session.get('project_id')
-            auditLogs(project_id,"-","Project Creation","Post Project Creation","-","Project","Success","Project has been created",request.user.username,datetime.datetime.now(),guid)
+            auditLogs(project_id,"0","Table Creation","Post Table Creation","",'{TABLE_NAME}',"Success","Project has been created",request.user.username,'current_timestamp()',guid)
             return Response("Success!!!")
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -95,10 +94,10 @@ class DataSourceView(APIView):
             cursor.callproc("proc_create_datasource",(project_id,data_source))
             cursor.close()
             project_ids = request.session.get('project_id')
-            auditLogs(project_ids,data_source,"Data Source Creation","Post Data Source Creation","-","Data Source","Success","Data Source has been created",request.user.username,datetime.datetime.now(),guid)
+            auditLogs(project_ids,data_source,"Data Source Creation","Post Data Source Creation","-","Data Source","Success","Data Source has been created",request.user.username,'current_timestamp()',guid)
             return Response("Success!!!")
         except Exception as e:
-            auditLogs(project_id,"-","Data Source Creation","Post Data Source Creation","-","Data Source","Failed",'error'+" "+str(e),request.user.username,datetime.datetime.now(),guid)
+            auditLogs(project_id,"-","Data Source Creation","Post Data Source Creation","-","Data Source","Failed",'error'+" "+str(e),request.user.username,'current_timestamp()',guid)
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
 
@@ -123,7 +122,7 @@ class uploadView(APIView):
                 ret = cursor.callproc("proc_schema_data",())
                 cursor.close()
                 project_id = request.session.get('project_id')
-                auditLogs(project_id,"-","Data Source Creation","Post Data Source Creation","-","Data Source","Failed",'error'+" "+str(e),request.user.username,datetime.datetime.now(),guid)
+                auditLogs(project_id,"-","Data Source Creation","Post Data Source Creation","-","Data Source","Failed",'error'+" "+str(e),request.user.username,'current_timestamp()',guid)
                 return Response(insert_serializer.data)
             else:
                 Response(insert_serializer.errors)
@@ -149,7 +148,7 @@ class UploadLayerView(APIView):
             if update_serializer.is_valid():
                 update_serializer.save()
                 project_id = request.session.get('project_id')
-                auditLogs(project_id,"-","Data Source Creation","Post Data Source Creation","-","Data Source","Failed",'error'+" "+str(e),request.user.username,datetime.datetime.now(),guid)
+                auditLogs(project_id,"-","Data Source Creation","Post Data Source Creation","-","Data Source","Failed",'error'+" "+str(e),request.user.username,'current_timestamp()',guid)
                 return Response(update_serializer.data)
             else:
                 return Response(update_serializer.errors)
@@ -179,7 +178,7 @@ class dataQualityCheck(APIView):
                     values = [f"'{item.get(field, 'NULL')}'" for field in fields]
                     statement = f"INSERT INTO SPOTLIGHT.UPLOAD_DATAQUALITYCHECK ({','.join(fields)}) VALUES ({','.join(['%s'] * len(fields))});"
                     cursor.execute(statement % tuple((values)))
-            auditLogs(request.session.get('project_id'),"-","Data Source Creation","Post Data Source Creation","-","Data Source","Failed",'error'+" "+str(e),request.user.username,datetime.datetime.now(),guid)
+            auditLogs(request.session.get('project_id'),"-","Data Source Creation","Post Data Source Creation","-","Data Source","Failed",'error'+" "+str(e),request.user.username,'current_timestamp()',guid)
             return Response("Success!!!")
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -508,13 +507,16 @@ class projectTempView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self,request):
         try:
-           token = request.data.get('token')
+           token = request.META.get('HTTP_AUTHORIZATION', '').split(' ')[1]
+           jwt_payload = jwt.decode(token, verify=False)
+           guid = request.user.guid
+           token = request.GET.get('guid')
            user_id = request.user.id
            user_name = request.user.username
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
-        return Response({'message': f'Hello, {user_name}! Your user ID is {user_id}'})
+        return Response({'message': f'Hello, {jwt_payload}! Your guid ID is {guid}'})
     
 # CFunction to log the message 
 def auditLogs(PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_NAME,STATUS,MESSAGE,LOGINUSER,CREATED_AT,GUID):

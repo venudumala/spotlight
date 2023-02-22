@@ -56,8 +56,7 @@ class LoginView(APIView):
         if user:
             payload = api_settings.JWT_PAYLOAD_HANDLER(user)
             token = api_settings.JWT_ENCODE_HANDLER(payload)
-            guid=str(user.id)+"_"+uuid.uuid4().hex
-            return Response({'userId':user.id,'username':user.username,'email':user.email,'token': token,'guid':guid})
+            return Response({'userId':user.id,'username':user.username,'email':user.email,'token': token})
         else:
             return Response({'error': 'Invalid Credentials'}, status=400)
 
