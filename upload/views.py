@@ -92,7 +92,7 @@ class DataSourceView(APIView):
             cursor.callproc("proc_create_datasource",(project_id,data_source))
             cursor.close()
             project_ids = request.session.get('project_id')
-            auditLogs(project_ids,data_source,"Data Source Creation","Post Data Source Creation","-","Data Source","Success","Data Source has been created",request.user.username,'current_timestamp()',guid)
+            auditLogs(project_ids,data_source,"Data Source Creation","Post Data Source Creation","-","Data Source","Success","Data Source has been created",request.user.username,'current_timestamp()',"")
             return Response("Success!!!")
         except Exception as e:
             auditLogs(project_id,"-","Data Source Creation","Post Data Source Creation","-","Data Source","Failed",'error'+" "+str(e),request.user.username,'current_timestamp()',"")
