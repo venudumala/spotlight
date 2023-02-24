@@ -5,5 +5,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('upload.urls')),
     path('account/',include('user_app.api.urls')),
+    path('dataload/',include('Airflow.urls')),
     
 ]
