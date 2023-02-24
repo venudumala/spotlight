@@ -44,17 +44,16 @@ class projectView(APIView):
 
     def post(self,request):
         try:
-            guid = request.user.guid
             project_serializer=ProjectSerializer(data=request.data)
             if project_serializer.is_valid():
                 project_serializer.save()
-                auditLogs("0","0","Project Creation","Post Project Creation","","Project","Success","Project has been created",request.user.username,'current_timestamp()',guid)
+                auditLogs("0","0","Project Creation","Post Project Creation","","Project","Success","Project has been created",request.user.username,'current_timestamp()',"")
                 return Response(project_serializer.data)
             else:
-                auditLogs("0","0","Project Creation","Post Project Creation","","Project","Success","Project has been created",request.user.username,'current_timestamp()',guid)
+                auditLogs("0","0","Project Creation","Post Project Creation","","Project","Success","Project has been created",request.user.username,'current_timestamp()',"")
                 return Response(project_serializer.errors)
         except Exception as e:
-            auditLogs("0","0","Project Creation","Post Project Failed","-","Project","Failed",'error'+" "+str(e),request.user.username,request.user.username,'current_timestamp()',guid)
+            auditLogs("0","0","Project Creation","Post Project Failed","-","Project","Failed",'error'+" "+str(e),request.user.username,request.user.username,'current_timestamp()',"")
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class createTableView(APIView):
