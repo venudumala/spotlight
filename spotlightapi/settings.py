@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'upload',
     'rest_framework.authtoken',
     'user_app',
+    'Airflow',
 ]
 
 MIDDLEWARE = [
