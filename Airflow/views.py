@@ -31,6 +31,19 @@ class SourceStatus(APIView):
         status=api_json['value']
         return Response({"status":status})
 
+class SourceFailMsg(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated] 
+    def post(self, request):
+        dag_id = request.data.get('dag_run_id')
+        headers = {'Content-Type': 'application/json','Authorization': 'Basic YWRtaW46YWRtaW4='}
+        api=requests.get(url=f'http://20.253.0.141:8080/api/v1/dags/source_test/dagRuns/{dag_id}/taskInstances/testing_source/xcomEntries/failed_msg'
+        ,headers=headers)
+        api_json=api.json()
+        failed_msg=api_json['value']
+        return Response({"value":failed_msg})
+
+
 class getSourceID(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
     permission_classes = [IsAuthenticated] 
