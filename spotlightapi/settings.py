@@ -48,7 +48,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'spotlightapi.urls'
 
 CORS_ALLOWED_ORIGINS = ["http://20.121.247.196:8000","http://20.121.247.196","http://20.121.247.196:80","http://20.253.0.141:8080","http://20.85.253.223:80"]
-CORS_ORIGIN_WHITELIST = ["http://20.121.247.196:8000","http://20.121.247.196","http://20.121.247.196:80","http://20.253.0.141:8080","http://20.85.253.223:80"]
+
 CORS_ALLOW_METHODS = ["DELETE", "GET", "PATCH","POST","PUT"] 
 CORS_ALLOW_HEADERS = [
     "accept",
@@ -62,7 +62,7 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_ALLOW_ALL = True
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
