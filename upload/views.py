@@ -529,7 +529,7 @@ class goldDataPreview(APIView):
             sql = query_str
             cur.execute(sql)
             records = cur.fetch_pandas_all().to_json(orient='records')
-            return HttpResponse(records)
+            return Response(records)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -542,9 +542,10 @@ class goldDataInsert(APIView):
             cur = connection.cursor()
             query_str=self.request.query_params.get('query_str')
             gold_table_name=self.request.query_params.get('gold_table_name')
-            sql = "CREATE OR REPLACE TABLE "+ gold_table_name +" AS (" + query_str + ")"
+            sql = "CREATE OR REPLACE TABLE GOLD_LAYER."+ gold_table_name +" AS (" + query_str + ")"
+            print(sql)
             cur.execute(sql)
             records = cur.fetch_pandas_all().to_json(orient='records')
-            return HttpResponse(records)
+            return Response(records)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
