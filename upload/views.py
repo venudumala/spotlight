@@ -273,9 +273,9 @@ class getSilverSchemaStructure(APIView):
             sql = "select column_name  from SPOTLIGHT.information_schema.columns where table_schema = 'SILVER_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"' AND column_name NOT LIKE '%_AIRBYTE_%'"
             cur.execute(sql)
             records = cur.fetchall()
-            return Response(records)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(records)
 
 class silverGoldTransformView(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
@@ -529,9 +529,9 @@ class goldDataPreview(APIView):
             sql = query_str
             cur.execute(sql)
             records = cur.fetch_pandas_all().to_json(orient='records')
-            return Response(records)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(records)
         
 
 class goldDataInsert(APIView):
@@ -543,9 +543,7 @@ class goldDataInsert(APIView):
             query_str=self.request.query_params.get('query_str')
             gold_table_name=self.request.query_params.get('gold_table_name')
             sql = "CREATE OR REPLACE TABLE GOLD_LAYER."+ gold_table_name +" AS (" + query_str + ")"
-            print(sql)
             cur.execute(sql)
-            records = cur.fetch_pandas_all().to_json(orient='records')
-            return Response(records)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response("Success !!!!")
