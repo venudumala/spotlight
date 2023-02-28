@@ -382,8 +382,19 @@ class getBronzeTableData(APIView):
     def get(self,request,table_name):
         try:
             cur = connection.cursor()
-            sql = "select *  from BRONZE_LAYER."+table_name
+            # to get the columns name of a bronze table by excluding the airbyte columns
+            sql=f"select column_name from spotlight.information_schema.columns where table_name='{table_name}' and column_name not like '_AIR%'"
             cur.execute(sql)
+            columns=cur.fetchall()
+            #loop to convert fetched data into a list of columns names
+            columns_list=[]
+            for col in columns:
+                for value in col:
+                    columns_list.append(value)
+            #loop to convert the column list into a string as a valid sql statement
+            columns_str= ','.join([col for col in columns_list])
+            sql_table=f"select {columns_str} from spotlight.bronze_layer.{table_name}"
+            cur.execute(sql_table)
             records = cur.fetch_pandas_all().to_json(orient='records')
             return HttpResponse(records)
         except Exception as e:
