@@ -612,12 +612,13 @@ class goldDataInsert(APIView):
                 query_str += " , " + custom_stmt 
             query_str += " FROM " + tbl_name
             if(filter_stmt):
-                query_str += " WHERE " + filter_stmt
+                query_str += " " + filter_stmt
             if(group_by_stmt):
                 query_str += " " + group_by_stmt
             if(order_by_stmt):
                 query_str += " "+ order_by_stmt
             sql = "CREATE OR REPLACE TABLE GOLD_LAYER."+ gold_table_name +" AS (" + query_str + ")"
+            print(sql)
             cur.execute(sql)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
