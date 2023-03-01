@@ -607,18 +607,17 @@ class goldDataInsert(APIView):
             col_list = self.request.query_params.get('col_list')
             query_str = "SELECT " + col_list 
             if(case_stmt):
-                query_str += " , " + case_stmt
+                query_str += " , " + case_stmt.trim()
             if(custom_stmt):
-                query_str += " , " + custom_stmt 
-            query_str += " FROM " + tbl_name
+                query_str += " , " + custom_stmt.trim() 
+            query_str += " FROM " + tbl_name.trim()
             if(filter_stmt):
-                query_str += " " + filter_stmt
+                query_str += " " + filter_stmt.trim()
             if(group_by_stmt):
-                query_str += " " + group_by_stmt
+                query_str += " " + group_by_stmt.trim()
             if(order_by_stmt):
-                query_str += " "+ order_by_stmt
-            sql = "CREATE OR REPLACE TABLE GOLD_LAYER."+ gold_table_name +" AS (" + query_str + ")"
-            print(sql)
+                query_str += " "+ order_by_stmt.trim()
+            sql = "CREATE OR REPLACE TABLE GOLD_LAYER."+ gold_table_name.trim() +" AS (" + query_str.trim() + ")"
             cur.execute(sql)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
