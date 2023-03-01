@@ -537,7 +537,7 @@ class goldDataPreview(APIView):
         try:
             query_str=self.request.query_params.get('query_str')
             cur = connection.cursor()
-            sql = query_str
+            sql = query_str + " lIMIT 15"
             cur.execute(sql)
             records = cur.fetch_pandas_all().to_json(orient='records')
         except Exception as e:
