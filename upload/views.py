@@ -383,7 +383,7 @@ class getBronzeTableData(APIView):
         try:
             cur = connection.cursor()
             # to get the columns name of a bronze table by excluding the airbyte columns
-            sql=f"select column_name from spotlight.information_schema.columns where table_name='{table_name}' and column_name not like '_AIR%'"
+            sql=f"select column_name from spotlight.information_schema.columns where table_name='{table_name.upper()}' and column_name not like '_AIR%'"
             cur.execute(sql)
             columns=cur.fetchall()
             #loop to convert fetched data into a list of columns names
