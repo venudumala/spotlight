@@ -563,7 +563,7 @@ class goldDataPreview(APIView):
                 query_str += " , " + custom_stmt 
             query_str += " FROM " + tbl_name
             if(filter_stmt):
-                query_str += " WHERE " + filter_stmt
+                query_str += "  " + filter_stmt
             if(group_by_stmt):
                 query_str += " " + group_by_stmt
             if(order_by_stmt):
@@ -607,17 +607,17 @@ class goldDataInsert(APIView):
             col_list = self.request.query_params.get('col_list')
             query_str = "SELECT " + col_list 
             if(case_stmt):
-                query_str += " , " + case_stmt.trim()
+                query_str += " , " + case_stmt
             if(custom_stmt):
-                query_str += " , " + custom_stmt.trim() 
-            query_str += " FROM " + tbl_name.trim()
+                query_str += " , " + custom_stmt
+            query_str += " FROM " + tbl_name
             if(filter_stmt):
-                query_str += " " + filter_stmt.trim()
+                query_str += " " + filter_stmt
             if(group_by_stmt):
-                query_str += " " + group_by_stmt.trim()
+                query_str += " " + group_by_stmt
             if(order_by_stmt):
-                query_str += " "+ order_by_stmt.trim()
-            sql = "CREATE OR REPLACE TABLE GOLD_LAYER."+ gold_table_name.trim() +" AS (" + query_str.trim() + ")"
+                query_str += " "+ order_by_stmt
+            sql = "CREATE OR REPLACE TABLE GOLD_LAYER."+ gold_table_name +" AS (" + query_str + ")"
             cur.execute(sql)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
