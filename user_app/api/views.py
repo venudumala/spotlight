@@ -10,6 +10,9 @@ from rest_framework_jwt.settings import api_settings
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import authenticate
 import uuid
+from django.core.mail import send_mail
+from django.conf import settings
+
 
 @api_view(['POST',])
 def registration_view(request):
@@ -28,8 +31,22 @@ def registration_view(request):
                             'refresh': str(refresh),
                             'access': str(refresh.access_token),
                         }
-
-
+            username=account.username
+            password=request.data.get('password')
+            recipient_list=list(account.email)
+            subject='Welcome to Spotlight - Your Account Details'
+            message=f'''Hi{username},
+                            Congratulations! You have successfully signed up for Spotlight. 
+                            We are delighted to have you as a member of our community. 
+                            Your username and password have been created, and your account is now active.
+                            Please find below your login details:
+                                Username: {username}
+                                Password: {password}
+                            Best regards,
+                            Spotlight Team.'''
+            from_email=settings.EMAIL_HOST_USER
+            send_mail(subject,message,from_email,recipient_list,fail_silently=False,)
+            return("Email sent successfully")
         else:
             data=registration_serializer.errors
         
