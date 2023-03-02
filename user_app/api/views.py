@@ -33,7 +33,8 @@ def registration_view(request):
                         }
             username=account.username
             password=request.data.get('password')
-            recipient_list=list(account.email)
+            receiver=account.email
+            recipient_list=[receiver]
             subject='Welcome to Spotlight - Your Account Details'
             message=f'''Hi{username},
                             Congratulations! You have successfully signed up for Spotlight. 
