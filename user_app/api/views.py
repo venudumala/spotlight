@@ -37,14 +37,14 @@ def registration_view(request):
             recipient_list=[receiver]
             subject='Welcome to Spotlight - Your Account Details'
             message=f'''Hi{username},
-                            Congratulations! You have successfully signed up for Spotlight. 
-                            We are delighted to have you as a member of our community. 
-                            Your username and password have been created, and your account is now active.
-                            Please find below your login details:
-                                Username: {username}
-                                Password: {password}
-                            Best regards,
-                            Spotlight Team.'''
+                        Congratulations! You have successfully signed up for Spotlight. 
+                        We are delighted to have you as a member of our community. 
+                        Your username and password have been created, and your account is now active.
+                        Please find below your login details:
+                            Username: {username}.
+                            Password: {password}.
+                        Best regards,
+                        Spotlight Team.'''
             from_email=settings.EMAIL_HOST_USER
             send_mail(subject,message,from_email,recipient_list,fail_silently=False,)
             # return("Email sent successfully")

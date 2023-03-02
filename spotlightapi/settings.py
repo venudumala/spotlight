@@ -179,8 +179,8 @@ AWS_STORAGE_BUCKET_NAME='spotlightus'
 AWS_QUERYSTRING_AUTH=False
 
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'spotlight.poc.alerts@gmail.com'
-EMAIL_HOST_PASSWORD = 'ygmpxvfecvgzpogu'
+EMAIL_HOST_USER = 'alertsspotlight@gmail.com'
+EMAIL_HOST_PASSWORD = 'wmmyagmbmzxhkxgc'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
