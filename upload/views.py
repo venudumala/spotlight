@@ -270,7 +270,20 @@ class getSilverSchemaStructure(APIView):
     def get(self,request):
         try:
             cur = connection.cursor()
-            sql = "select column_name  from SPOTLIGHT.information_schema.columns where table_schema = 'SILVER_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"' AND column_name NOT LIKE '%_AIRBYTE_%'"
+            sql = "select column_name  from SPOTLIGHT.information_schema.columns where table_schema = 'SILVER_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"'"
+            cur.execute(sql)
+            records = cur.fetchall()
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(records)
+
+class getSilverSchemaColumn(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        try:
+            cur = connection.cursor()
+            sql = "select column_name  from SPOTLIGHT.information_schema.columns where table_schema = 'SILVER_LAYER' and table_name ='"+self.request.query_params.get('table_name')+"'"
             cur.execute(sql)
             records = cur.fetchall()
         except Exception as e:
@@ -577,21 +590,7 @@ class goldDataPreview(APIView):
         return Response(records)  
         
 
-# class goldDataInsert(APIView):
-#     authentication_classes = [JSONWebTokenAuthentication]
-#     permission_classes = [IsAuthenticated]
-#     def get(self,request):
-#         try:
-#             cur = connection.cursor()
-#             query_str=self.request.query_params.get('query_str')
-#             gold_table_name=self.request.query_params.get('gold_table_name')
-#             sql = "CREATE OR REPLACE TABLE GOLD_LAYER."+ gold_table_name +" AS (" + query_str + ")"
-#             cur.execute(sql)
-#         except Exception as e:
-#             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-#         return Response("Success !!!!")
-
-class goldDataInsert(APIView):
+class goldDataCreate(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self,request):
@@ -618,6 +617,38 @@ class goldDataInsert(APIView):
             if(order_by_stmt):
                 query_str += " "+ order_by_stmt
             sql = "CREATE OR REPLACE TABLE GOLD_LAYER."+ gold_table_name +" AS (" + query_str + ")"
+            cur.execute(sql)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response("Success !!!!")
+    
+class goldDataInsert(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        try:
+            cur = connection.cursor()
+            gold_table_name=self.request.query_params.get('gold_table_name')
+            case_stmt=self.request.query_params.get('case_stmt')
+            filter_stmt=self.request.query_params.get('filter_stmt')
+            order_by_stmt=self.request.query_params.get('order_by_stmt')
+            group_by_stmt=self.request.query_params.get('group_by_stmt')
+            custom_stmt=self.request.query_params.get('custom_stmt')
+            tbl_name = self.request.query_params.get('tbl_name')
+            col_list = self.request.query_params.get('col_list')
+            query_str = "SELECT " + col_list 
+            if(case_stmt):
+                query_str += " , " + case_stmt
+            if(custom_stmt):
+                query_str += " , " + custom_stmt
+            query_str += " FROM " + tbl_name
+            if(filter_stmt):
+                query_str += " " + filter_stmt
+            if(group_by_stmt):
+                query_str += " " + group_by_stmt
+            if(order_by_stmt):
+                query_str += " "+ order_by_stmt
+            sql = "Insert into GOLD_LAYER."+ gold_table_name+" ("+col_list +")  (" + query_str + ")"
             cur.execute(sql)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

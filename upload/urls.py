@@ -23,6 +23,7 @@ urlpatterns = [
     path('getSilverTable/',views.getSilverTable.as_view(),name='getSilverTable'),
     path('getGoldTable/<str:table_name>',views.getGoldTable.as_view(),name='getGoldTable'),
     path('getSilverSchemaStructure/',views.getSilverSchemaStructure.as_view(),name='getSilverSchemaStructure'),
+    path('getSilverSchemaColumn/',views.getSilverSchemaColumn.as_view(),name='getSilverSchemaColumn'),
     path('silverDataInsert/',views.silverDataInsert.as_view(),name='silverDataInsert'),
     path('getBronzeTable/',views.getBronzeTable.as_view(),name='getBronzeTable'),
     path('getBronzeSchemaStructure/',views.getBronzeSchemaStructure.as_view(),name='getBronzeSchemaStructure'),
