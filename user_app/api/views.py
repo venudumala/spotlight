@@ -46,7 +46,7 @@ def registration_view(request):
                             Spotlight Team.'''
             from_email=settings.EMAIL_HOST_USER
             send_mail(subject,message,from_email,recipient_list,fail_silently=False,)
-            return("Email sent successfully")
+            # return("Email sent successfully")
         else:
             data=registration_serializer.errors
         
