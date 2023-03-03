@@ -506,7 +506,7 @@ class goldLayerDataView(APIView):
     def get(self,request):
         try:
             cur = connection.cursor()
-            sql = "select *  from SPOTLIGHT.UPLOAD_GOLDLAYERDATA"
+            sql = "select * from SPOTLIGHT.INFORMATION_SCHEMA.TABLES where TABLE_CATALOG = 'SPOTLIGHT' AND TABLE_SCHEMA = 'GOLD_LAYER'"
             cur.execute(sql)
             records = cur.fetch_pandas_all().to_json(orient='records')
             cur.close()
