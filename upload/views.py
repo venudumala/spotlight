@@ -537,8 +537,8 @@ def auditLogs(PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_N
         cursor = connection.cursor()
         statement =  f"insert into UPLOAD_AUDIT(PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_NAME,STATUS,MESSAGE,CREATED_BY,UID,CREATED_AT) values('{PROJECT_ID}','{DATASOURCE}','{OPERATION}','{CALLED_FUNCTION_NAME}','{LAYER}','{TABLE_NAME}','{STATUS}','{MESSAGE}','{LOGINUSER}','{GUID}',{CREATED_AT})"
         print(statement)
-        cursor.execute(statement)
-        cursor.close()
+        # cursor.execute(statement)
+        # cursor.close()
     except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
