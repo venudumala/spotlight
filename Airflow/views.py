@@ -5,7 +5,20 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.db import connection
+from rest_framework import status
 # Create your views here.
+
+def auditLogs(PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_NAME,STATUS,MESSAGE,LOGINUSER,CREATED_AT,GUID):
+    try:
+    #define cursor 
+        cursor = connection.cursor()
+        statement =  f"insert into UPLOAD_AUDIT(PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_NAME,STATUS,MESSAGE,CREATED_BY,UID,CREATED_AT) values('{PROJECT_ID}','{DATASOURCE}','{OPERATION}','{CALLED_FUNCTION_NAME}','{LAYER}','{TABLE_NAME}','{STATUS}','{MESSAGE}','{LOGINUSER}','{GUID}',{CREATED_AT})"
+        print(statement)
+        cursor.execute(statement)
+        cursor.close()
+    except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class sourceTestMssql(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
@@ -17,6 +30,8 @@ class sourceTestMssql(APIView):
         api=requests.post(url='http://20.253.0.141:8080/api/v1/dags/source_test/dagRuns',headers=headers, data=payload)
         api_js=api.json()
         dag_id=api_js['dag_run_id']
+        tablename=data['dbname']
+        auditLogs(request.session.get('project_id'),"","Data loading started","Source to bonze","source to bronze",tablename,"Success","Data has been added",request.user.username,'current_timestamp()',"")
         return Response({"dag_run_id":dag_id})
 
 class SourceStatus(APIView):
