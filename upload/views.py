@@ -45,15 +45,37 @@ class projectView(APIView):
     def post(self,request):
         try:
             project_serializer=ProjectSerializer(data=request.data)
-            if project_serializer.is_valid():
+            if project_serializer.is_valid(raise_exception=True):
                 project_serializer.save()
-                #auditLogs("0","0","Project Creation","Post Project Creation","","Project","Success","Project has been created",request.user.username,'current_timestamp()',"")
+                # auditLogs("0","0","Project Creation","Post Project Creation","","Project","Success","Project has been created",request.user.username,'current_timestamp()',"")
                 return Response(project_serializer.data)
             else:
-                #auditLogs("0","0","Project Creation","Post Project Creation","","Project","Success","Project has been created",request.user.username,'current_timestamp()',"")
+                # auditLogs("0","0","Project Creation","Post Project Creation","","Project","Success","Project has been created",request.user.username,'current_timestamp()',"")
                 return Response(project_serializer.errors)
         except Exception as e:
-            #auditLogs("0","0","Project Creation","Post Project Failed","-","Project","Failed",'error'+" "+str(e),request.user.username,request.user.username,'current_timestamp()',"")
+            auditLogs("0","0","Project Creation","Post Project Failed","-","Project","Failed",'error'+" "+str(e),request.user.username,request.user.username,'current_timestamp()',"")
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self,request):
+        try:
+            id=request.data.get('id')
+            project=Project.objects.get(pk=id)
+            project_serializer=ProjectSerializer(project, data=request.data)
+            if project_serializer.is_valid():
+                project_serializer.save()
+                return Response(project_serializer.data)
+            else:
+                return Response(project_serializer.errors)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+    def delete(self,request):
+        try:
+            id=request.data.get('id')
+            project=Project.objects.get(pk=id)
+            project.delete()
+            return Response("Project has been deleted successfully")
+        except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class createTableView(APIView):
