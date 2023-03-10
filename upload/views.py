@@ -53,7 +53,7 @@ class projectView(APIView):
                 auditLogs("0","0","Project Creation","Post Project Creation","Project Dashboard","Project","Failure","Project has not been created",request.user.username)
                 return Response(project_serializer.errors)
         except Exception as e:
-            auditLogs("0","0","Project Creation","Post Project Failed","-","Project","Failed",'error'+" "+str(e),request.user.username,request.user.username)
+            auditLogs("0","0","Project Creation","Post Project Failed","-","Project","Failed",'error'+" "+str(e),request.user.username)
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
     def put(self,request):
