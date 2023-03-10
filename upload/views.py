@@ -47,13 +47,13 @@ class projectView(APIView):
             project_serializer=ProjectSerializer(data=request.data)
             if project_serializer.is_valid(raise_exception=True):
                 project_serializer.save()
-                # auditLogs("0","0","Project Creation","Post Project Creation","","Project","Success","Project has been created",request.user.username,'current_timestamp()',"")
+                auditLogs("0","0","Project Creation","Post Project Creation","Project Dashboard","Project","Success","Project has been created",request.user.username)
                 return Response(project_serializer.data)
             else:
-                # auditLogs("0","0","Project Creation","Post Project Creation","","Project","Success","Project has been created",request.user.username,'current_timestamp()',"")
+                auditLogs("0","0","Project Creation","Post Project Creation","Project Dashboard","Project","Failure","Project has not been created",request.user.username)
                 return Response(project_serializer.errors)
         except Exception as e:
-            auditLogs("0","0","Project Creation","Post Project Failed","-","Project","Failed",'error'+" "+str(e),request.user.username,request.user.username,'current_timestamp()',"")
+            auditLogs("0","0","Project Creation","Post Project Failed","-","Project","Failed",'error'+" "+str(e),request.user.username,request.user.username)
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
     def put(self,request):
@@ -553,11 +553,11 @@ class projectTempView(APIView):
         return Response({'message': f'Hello, {jwt_payload}! Your guid ID is {guid}'})
     
 # CFunction to log the message 
-def auditLogs(PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_NAME,STATUS,MESSAGE,LOGINUSER,CREATED_AT,GUID):
+def auditLogs(PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_NAME,STATUS,MESSAGE,LOGINUSER):
     try:
     #define cursor 
         cursor = connection.cursor()
-        statement =  f"insert into UPLOAD_AUDIT(PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_NAME,STATUS,MESSAGE,CREATED_BY,UID,CREATED_AT) values('{PROJECT_ID}','{DATASOURCE}','{OPERATION}','{CALLED_FUNCTION_NAME}','{LAYER}','{TABLE_NAME}','{STATUS}','{MESSAGE}','{LOGINUSER}','{GUID}',{CREATED_AT})"
+        statement =  f"insert into spotlight.AUDIT(PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_NAME,STATUS,MESSAGE,CREATED_BY) values('{PROJECT_ID}','{DATASOURCE}','{OPERATION}','{CALLED_FUNCTION_NAME}','{LAYER}','{TABLE_NAME}','{STATUS}','{MESSAGE}','{LOGINUSER}')"
         print(statement)
         cursor.execute(statement)
         cursor.close()
