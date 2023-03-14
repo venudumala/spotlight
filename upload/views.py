@@ -45,7 +45,7 @@ class projectView(APIView):
     def post(self,request):
         try:
             project_serializer=ProjectSerializer(data=request.data)
-            if project_serializer.is_valid():
+            if project_serializer.is_valid(raise_exception=True):
                 project_serializer.save()
                 auditLogs("0","0","Project Creation","Post Project Creation","Project Dashboard","Project","Success","Project has been created",request.user.username)
                 return Response(project_serializer.data)
