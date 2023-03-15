@@ -26,6 +26,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.project_name=validated_data.get('project_name',instance.project_name)
+        instance.description=validated_data.get('description',instance.description)
         instance.save()
         return instance
 

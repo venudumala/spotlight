@@ -11,7 +11,7 @@ import pandas as pd
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 import jwt
-
+import uuid
 
 class databaseView(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
@@ -49,11 +49,11 @@ class projectView(APIView):
                 project_serializer.save()
                 auditLogs("0","0","Project Creation","Post Project Creation","Project Dashboard","Project","Success","Project has been created",request.user.username)
                 return Response(project_serializer.data)
-            else:
-                auditLogs("0","0","Project Creation","Post Project Creation","Project Dashboard","Project","Failure","Project has not been created",request.user.username)
-                return Response(project_serializer.errors)
+            # else:
+            #     auditLogs("0","0","Project Creation","Post Project Creation","Project Dashboard","Project","Failure","Project has not been created",request.user.username)
+            #     return Response(project_serializer.errors)
         except Exception as e:
-            auditLogs("0","0","Project Creation","Post Project Failed","-","Project","Failed",'error'+" "+str(e),request.user.username,request.user.username)
+            auditLogs("0","0","Project Creation","Post Project Failed","-","Project","Failed",'Project has not been created',request.user.username)
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
     def put(self,request):
@@ -61,7 +61,7 @@ class projectView(APIView):
             id=request.data.get('id')
             project=Project.objects.get(pk=id)
             project_serializer=ProjectSerializer(project, data=request.data)
-            if project_serializer.is_valid():
+            if project_serializer.is_valid(raise_exception=True):
                 project_serializer.save()
                 return Response(project_serializer.data)
             else:
@@ -557,7 +557,9 @@ def auditLogs(PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_N
     try:
     #define cursor 
         cursor = connection.cursor()
-        statement =  f"insert into spotlight.AUDIT(PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_NAME,STATUS,MESSAGE,CREATED_BY) values('{PROJECT_ID}','{DATASOURCE}','{OPERATION}','{CALLED_FUNCTION_NAME}','{LAYER}','{TABLE_NAME}','{STATUS}','{MESSAGE}','{LOGINUSER}')"
+        guid=uuid.uuid4()
+        created_at=datetime.datetime.now()
+        statement =  f"insert into spotlight.AUDIT(UID,PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_NAME,STATUS,MESSAGE,CREATED_BY,CREATED_AT) values('{guid}','{PROJECT_ID}','{DATASOURCE}','{OPERATION}','{CALLED_FUNCTION_NAME}','{LAYER}','{TABLE_NAME}','{STATUS}','{MESSAGE}','{LOGINUSER}','{created_at}')"
         print(statement)
         cursor.execute(statement)
         cursor.close()
