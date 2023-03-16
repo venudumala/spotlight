@@ -12,6 +12,12 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 import jwt
 import uuid
+#function to convert dict type exeception into string
+def dict_str (x):
+    msg=''
+    for i in x.keys():
+        msg = msg + f"{i}:{x[i][0]}"
+    return msg
 
 class databaseView(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
@@ -53,8 +59,10 @@ class projectView(APIView):
             #     auditLogs("0","0","Project Creation","Post Project Creation","Project Dashboard","Project","Failure","Project has not been created",request.user.username)
             #     return Response(project_serializer.errors)
         except Exception as e:
-            auditLogs("0","0","Project Creation","Post Project Failed","-","Project","Failed",'Project has not been created',request.user.username)
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            error_msg=project_serializer.errors
+            msg=dict_str(error_msg) 
+            auditLogs("0","0","Project Creation","Post Project Failed","-","Project","Failed",msg,request.user.username)
+            return Response(e.args, status=status.HTTP_400_BAD_REQUEST)
     
     def put(self,request):
         try:
@@ -165,7 +173,7 @@ class UploadLayerView(APIView):
             if update_serializer.is_valid():
                 update_serializer.save()
                 project_ids = request.session.get('project_id')
-                auditLogs(project_ids,"","File Uploaded Done","File Uploaded Creation Done","","File Uploaded","Success","Data Source has been created",request.user.username,'current_timestamp()',"")
+                #auditLogs(project_ids,"","File Uploaded Done","File Uploaded Creation Done","","File Uploaded","Success","Data Source has been created",request.user.username,'current_timestamp()',"")
                 return Response(update_serializer.data)
             else:
                 return Response(update_serializer.errors)
@@ -238,7 +246,11 @@ class projectDataSourceData(APIView):
             sql = "select pr.PROJECT_NAME, pr.user_id, pr.DESCRIPTION,ds.DATA_SOURCE, ds.TABLE_RECORDS, ds.TOTAL_RECORDS,ds.FINAL_DATA_FILE_GENERATE from SPOTLIGHT.SPOTLIGHT.UPLOAD_PROJECT as pr inner join SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE as ds on pr.id =ds.project_id where pr.id="+self.request.query_params.get('project_id')
             cur.execute(sql)
             records = cur.fetch_pandas_all().to_json(orient='records')
-            return Response(records)
+            sql1='select ID,PROJECT_NAME from UPLOAD_PROJECT where id='+self.request.query_params.get('project_id')
+            cur.execute(sql1)
+            project_values=cur.fetchall()
+            data = [dict(zip([col[0] for col in cur.description], row)) for row in project_values]
+            return Response({"records":records, "projectValue":data})
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -559,7 +571,7 @@ def auditLogs(PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_N
         cursor = connection.cursor()
         guid=uuid.uuid4()
         created_at=datetime.datetime.now()
-        statement =  f"insert into spotlight.AUDIT(UID,PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_NAME,STATUS,MESSAGE,CREATED_BY,CREATED_AT) values('{guid}','{PROJECT_ID}','{DATASOURCE}','{OPERATION}','{CALLED_FUNCTION_NAME}','{LAYER}','{TABLE_NAME}','{STATUS}','{MESSAGE}','{LOGINUSER}','{created_at}')"
+        statement =  f"insert into spotlight.UPLOAD_AUDIT(UID,PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_NAME,STATUS,MESSAGE,CREATED_BY,CREATED_AT) values('{guid}','{PROJECT_ID}','{DATASOURCE}','{OPERATION}','{CALLED_FUNCTION_NAME}','{LAYER}','{TABLE_NAME}','{STATUS}','{MESSAGE}','{LOGINUSER}','{created_at}')"
         print(statement)
         cursor.execute(statement)
         cursor.close()
