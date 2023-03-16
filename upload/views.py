@@ -1,8 +1,8 @@
 import datetime
 import json
 from django.http import HttpResponse
-from .models import DataQualityCheck, DataSource, DataType, Database, Project, QueryLogs, Upload, filterSymbol, goldLayerData
-from .serializers import DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer, filterSymbolSerializer, goldLayerDataSerializer, projectDataSourceDataSerializer
+from .models import DataQualityCheck, DataSource, DataType, Database, Project, QueryLogs, Upload, filterSymbol, goldLayerData, Rules
+from .serializers import DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer, filterSymbolSerializer, goldLayerDataSerializer, projectDataSourceDataSerializer, RulesSerializer
 from rest_framework import status,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,6 +10,7 @@ from django.db import connection
 import pandas as pd
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import render
 import jwt
 import uuid
 #function to convert dict type exeception into string
@@ -689,3 +690,47 @@ class goldDataInsert(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response("Success !!!!")
+    
+
+class rulesView(APIView):
+    def get(self, request):
+        try:
+            project_id = request.data.get('project_id')
+            data = Rules.objects.filter(project_id=project_id)
+            databaseserializer=RulesSerializer(data,many=True)
+            return JsonResponse(databaseserializer.data, safe=False)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self,request):
+        try:
+            database_serializer=RulesSerializer(data=request.data)
+            if database_serializer.is_valid():
+                database_serializer.save()
+                return Response(database_serializer.data)
+            else:
+                return Response(database_serializer.errors)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+    def put(self,request):
+        try:
+            ruleId=request.data.get('rule_id')
+            rules=Rules.objects.get(pk=ruleId)
+            rules_serializer=RulesSerializer(rules, data=request.data)
+            if rules_serializer.is_valid():
+                rules_serializer.save()
+                return Response(rules_serializer.data)
+            else:
+                return Response(rules_serializer.errors)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+    def delete(self,request):
+        try:
+            ruleId=request.data.get('rule_id')
+            rules=Rules.objects.get(pk=ruleId)
+            rules.delete()
+            return Response("Rule has been deleted successfully")
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import DataQualityCheck, DataSource, DataType, Database, Project, Upload, filterSymbol, goldLayerData
+from .models import DataQualityCheck, DataSource, DataType, Database, Project, Upload, filterSymbol, goldLayerData, Rules
 from django.db import models
+
 
 
 class DatabaseSerializer(serializers.ModelSerializer):
@@ -103,3 +104,7 @@ class goldLayerDataSerializer(serializers.Serializer):
     def create(self, validated_data):
         return goldLayerData.objects.create(**validated_data)
 
+class RulesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rules
+        fields = '__all__'

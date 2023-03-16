@@ -113,3 +113,21 @@ class Audit(models.Model):
   MESSAGE=models.CharField(max_length=500,default=None,null=True)
   def __str__(self):
     return self.OPERATION
+  
+
+  # Model for defining Rules
+class Rules(models.Model):
+    project_id = models.IntegerField(blank=True,null=True)
+    rule_name = models.CharField(max_length=100)
+    layer = models.CharField(max_length=100)
+    table_name = models.CharField(max_length=100)
+    created_by = models.CharField(max_length=100)
+    created_at = models.CharField(max_length=100)
+    description = models.CharField(max_length=100)
+    is_active = models.BooleanField(blank=True,null=True)
+    source_table = models.CharField(max_length=100)
+    target_table = models.CharField(max_length=100)
+    rules_data = models.JSONField(null=True, blank=True)
+
+    def __str__(self):
+        return self.title
