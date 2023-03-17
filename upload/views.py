@@ -1,8 +1,8 @@
 import datetime
 import json
-from django.http import HttpResponse
-from .models import DataQualityCheck, DataSource, DataType, Database, Project, QueryLogs, Upload, filterSymbol, goldLayerData
-from .serializers import DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer, filterSymbolSerializer, goldLayerDataSerializer, projectDataSourceDataSerializer
+from django.http import HttpResponse, JsonResponse
+from .models import DataQualityCheck, DataSource, DataType, Database, Project, QueryLogs, Upload, WorkflowRules, filterSymbol, goldLayerData
+from .serializers import DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer, WorkflowRulesDeserializer, WorkflowRulesSerializer, filterSymbolSerializer, goldLayerDataSerializer, projectDataSourceDataSerializer
 from rest_framework import status,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -243,7 +243,7 @@ class projectDataSourceData(APIView):
         try:
             request.session['project_id'] =self.request.query_params.get('project_id')
             cur = connection.cursor()
-            sql = "select ds.id, pr.PROJECT_NAME, pr.user_id, pr.DESCRIPTION,ds.DATA_SOURCE, ds.TABLE_RECORDS, ds.TOTAL_RECORDS,ds.FINAL_DATA_FILE_GENERATE from SPOTLIGHT.SPOTLIGHT.UPLOAD_PROJECT as pr inner join SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE as ds on pr.id =ds.project_id where pr.id="+self.request.query_params.get('project_id')
+            sql = "select pr.PROJECT_NAME, pr.user_id, pr.DESCRIPTION,ds.DATA_SOURCE, ds.TABLE_RECORDS, ds.TOTAL_RECORDS,ds.FINAL_DATA_FILE_GENERATE from SPOTLIGHT.SPOTLIGHT.UPLOAD_PROJECT as pr inner join SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE as ds on pr.id =ds.project_id where pr.id="+self.request.query_params.get('project_id')
             cur.execute(sql)
             records = cur.fetch_pandas_all().to_json(orient='records')
             sql1='select ID,PROJECT_NAME from UPLOAD_PROJECT where id='+self.request.query_params.get('project_id')
@@ -447,39 +447,6 @@ class getBronzeTableData(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-# APIView to get tables of bronze layer and their respective columns
-class getBronzeTableandColumns(APIView):
-    authentication_classes = [JSONWebTokenAuthentication]
-    permission_classes = [IsAuthenticated]
-    def get(self,request,project_id):
-            try:
-                # project_id = request.data.get('project_id')
-                cur=connection.cursor()
-                result={}
-                tables=[]
-                # SQL statement to get tables of bronze layer
-                get_datasource=f"select data_source from spotlight.upload_datasource where project_id={project_id}"
-                cur.execute(get_datasource)
-                table=cur.fetchall()
-                # loop to append the tables into list
-                for tab in table:
-                    tables.append(tab[0])
-
-                # looping through the above list of tables to get the column names of respective tables
-                for i in tables:
-                    # SQL statement to get column names of  table
-                    get_columns=f"select column_name from information_schema.columns where table_schema='BRONZE_LAYER' and TABLE_NAME='{i.upper()}' order by ordinal_position"
-                    cur.execute(get_columns)
-                    records=cur.fetchall()
-                    columns=[]
-                    for col in records:
-                        columns.append(col[0])
-                    # to get result in key(table_name) value(column names) pair
-                    result[i]=columns
-                return Response(result)
-            except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST) 
-
 class checkColumnSilverTable(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -653,11 +620,10 @@ class goldDataPreview(APIView):
             sql = query_str + " LIMIT 30"
             cur = connection.cursor()
             cur.execute(sql)
-            records = cur.fetchall()
-            data = [dict(zip([col[0] for col in cur.description], row)) for row in records]
+            records = cur.fetch_pandas_all().to_json(orient='records')
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(data)  
+        return Response(records)  
         
 
 class goldDataCreate(APIView):
@@ -724,3 +690,70 @@ class goldDataInsert(APIView):
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response("Success !!!!")
     
+# APIView to get tables of bronze layer and their respective columns
+class getBronzeTableandColumns(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self,request,project_id):
+            try:
+                # project_id = request.data.get('project_id')
+                cur=connection.cursor()
+                result={}
+                tables=[]
+                # SQL statement to get tables of bronze layer
+                get_datasource=f"select data_source from spotlight.upload_datasource where project_id={project_id}"
+                cur.execute(get_datasource)
+                table=cur.fetchall()
+                # loop to append the tables into list
+                for tab in table:
+                    tables.append(tab[0])
+
+                # looping through the above list of tables to get the column names of respective tables
+                for i in tables:
+                    # SQL statement to get column names of  table
+                    get_columns=f"select column_name from information_schema.columns where table_schema='BRONZE_LAYER' and TABLE_NAME='{i.upper()}' order by ordinal_position"
+                    cur.execute(get_columns)
+                    records=cur.fetchall()
+                    columns=[]
+                    for col in records:
+                        columns.append(col[0])
+                    # to get result in key(table_name) value(column names) pair
+                    result[i]=columns
+                return Response(result)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST) 
+
+
+class worflowRulesView(APIView):
+    def get(self, request,project_id):
+        try:
+            data = WorkflowRules.objects.filter(project_id=project_id)
+            databaseserializer=WorkflowRulesSerializer(data,many=True)
+            return JsonResponse(databaseserializer.data, safe=False)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self,request):
+        try:
+            database_serializer=WorkflowRulesDeserializer(data=request.data)
+            if database_serializer.is_valid():
+                database_serializer.save()
+                return Response(database_serializer.data)
+            else:
+                return Response(database_serializer.errors)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+    def get(self,request,rule_name):
+        try:
+            ruleId=request.data.get('rule_name')
+            rules=WorkflowRules.objects.get(pk=ruleId)
+            rules_serializer=WorkflowRulesDeserializer(rules, data=request.data)
+            if rules_serializer.is_valid():
+                rules_serializer.save()
+                return Response(rules_serializer.data)
+            else:
+                return Response(rules_serializer.errors)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        

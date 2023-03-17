@@ -1,5 +1,6 @@
+import json
 from rest_framework import serializers
-from .models import DataQualityCheck, DataSource, DataType, Database, Project, Upload, filterSymbol, goldLayerData
+from .models import DataQualityCheck, DataSource, DataType, Database, Project, Upload, WorkflowRules, filterSymbol, goldLayerData
 from django.db import models
 
 
@@ -103,3 +104,30 @@ class goldLayerDataSerializer(serializers.Serializer):
     def create(self, validated_data):
         return goldLayerData.objects.create(**validated_data)
 
+class WorkflowRulesSerializer(serializers.ModelSerializer):
+    rules_data = serializers.SerializerMethodField()
+    class Meta:
+        model = WorkflowRules
+        fields = '__all__'
+        
+    def get_rules_data(self, obj):
+        return json.loads(obj.rules_data)
+    
+class WorkflowRulesDeserializer(serializers.ModelSerializer):  
+    rules_data = serializers.JSONField()
+    class Meta:
+        model = WorkflowRules
+        fields = '__all__'
+
+    def create(self, validated_data):
+        rules_data = validated_data.pop('rules_data')
+        validated_data['rules_data'] = json.dumps(rules_data)
+        return WorkflowRules.objects.create(**validated_data)
+    
+    def update(self, instance, validated_data):
+        rules_data = validated_data.pop('rules_data')
+        validated_data['rules_data'] = json.dumps(rules_data)
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+        instance.save()
+        return instance
