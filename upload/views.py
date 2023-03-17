@@ -451,9 +451,9 @@ class getBronzeTableData(APIView):
 class getBronzeTableandColumns(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
     permission_classes = [IsAuthenticated]
-    def get(self,request):
+    def get(self,request,project_id):
             try:
-                project_id = request.data.get('project_id')
+                # project_id = request.data.get('project_id')
                 cur=connection.cursor()
                 result={}
                 tables=[]

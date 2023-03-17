@@ -35,5 +35,5 @@ urlpatterns = [
     path('alterTableSilver/',views.alterTableSilver.as_view(),name='alterTableSilver'),
     path('checkColumnSilverTable/',views.checkColumnSilverTable.as_view(),name='checkColumnSilverTable'),
     path('dataSource/<int:project_id>/<str:data_source>',views.DataSourceView.as_view()),
-    path('getBronzeTableandColumns/',views.getBronzeTableandColumns.as_view(), name='bronze_table_and_columns')
+    path('getBronzeTableandColumns/<int:project_id>',views.getBronzeTableandColumns.as_view(), name='bronze_table_and_columns')
 ]
