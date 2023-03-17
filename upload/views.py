@@ -12,6 +12,9 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 import jwt
 import uuid
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
+
 #function to convert dict type exeception into string
 def dict_str (x):
     msg=''
@@ -744,10 +747,9 @@ class worflowRulesView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
-    def get(self,request,rule_name):
+    def put(self,request,pk):
         try:
-            ruleId=request.data.get('rule_name')
-            rules=WorkflowRules.objects.get(pk=ruleId)
+            rules=WorkflowRules.objects.get(pk=pk)
             rules_serializer=WorkflowRulesDeserializer(rules, data=request.data)
             if rules_serializer.is_valid():
                 rules_serializer.save()
@@ -756,4 +758,3 @@ class worflowRulesView(APIView):
                 return Response(rules_serializer.errors)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
