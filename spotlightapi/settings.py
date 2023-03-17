@@ -138,7 +138,7 @@ JWT_AUTH = {
     'JWT_RESPONSE_PAYLOAD_HANDLER':
     'rest_framework_jwt.utils.jwt_response_payload_handler',
 
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=1800),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=7200),
 
     'JWT_ALLOW_REFRESH': True,
 
@@ -177,10 +177,4 @@ AWS_SECRET_ACCESS_KEY='MqrV+2RwuhQsOKOhYi244VypkZuNGQ14scD3aeUI'
 AWS_STORAGE_BUCKET_NAME='spotlightus'
 
 AWS_QUERYSTRING_AUTH=False
-
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'apikey' # this is exactly the value 'apikey'
-EMAIL_HOST_PASSWORD = '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'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
 # DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
