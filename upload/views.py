@@ -12,8 +12,6 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 import jwt
 import uuid
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
 
 #function to convert dict type exeception into string
 def dict_str (x):
