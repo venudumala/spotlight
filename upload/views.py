@@ -246,7 +246,7 @@ class projectDataSourceData(APIView):
         try:
             request.session['project_id'] =self.request.query_params.get('project_id')
             cur = connection.cursor()
-            sql = "select pr.PROJECT_NAME, pr.user_id, pr.DESCRIPTION,ds.DATA_SOURCE, ds.TABLE_RECORDS, ds.TOTAL_RECORDS,ds.FINAL_DATA_FILE_GENERATE from SPOTLIGHT.SPOTLIGHT.UPLOAD_PROJECT as pr inner join SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE as ds on pr.id =ds.project_id where pr.id="+self.request.query_params.get('project_id')
+            sql = "select ds.id,pr.PROJECT_NAME, pr.user_id, pr.DESCRIPTION,ds.DATA_SOURCE, ds.TABLE_RECORDS, ds.TOTAL_RECORDS,ds.FINAL_DATA_FILE_GENERATE from SPOTLIGHT.SPOTLIGHT.UPLOAD_PROJECT as pr inner join SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE as ds on pr.id =ds.project_id where pr.id="+self.request.query_params.get('project_id')
             cur.execute(sql)
             records = cur.fetch_pandas_all().to_json(orient='records')
             sql1='select ID,PROJECT_NAME from UPLOAD_PROJECT where id='+self.request.query_params.get('project_id')
@@ -623,10 +623,11 @@ class goldDataPreview(APIView):
             sql = query_str + " LIMIT 30"
             cur = connection.cursor()
             cur.execute(sql)
-            records = cur.fetch_pandas_all().to_json(orient='records')
+            records = cur.fetchall()
+            data = [dict(zip([col[0] for col in cur.description], row)) for row in records]
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(records)  
+        return Response(data)  
         
 
 class goldDataCreate(APIView):
@@ -714,14 +715,14 @@ class getBronzeTableandColumns(APIView):
                 # looping through the above list of tables to get the column names of respective tables
                 for i in tables:
                     # SQL statement to get column names of  table
-                    get_columns=f"select column_name from information_schema.columns where table_schema='BRONZE_LAYER' and TABLE_NAME='{i.upper()}' order by ordinal_position"
+                    get_columns=f"select column_name from information_schema.columns where table_schema='BRONZE_LAYER' and TABLE_NAME='{i.upper()}' and column_name not like '_AIR%' order by ordinal_position"
                     cur.execute(get_columns)
                     records=cur.fetchall()
                     columns=[]
                     for col in records:
                         columns.append(col[0])
                     # to get result in key(table_name) value(column names) pair
-                    result[i]=columns
+                    result[i.upper()]=columns
                 return Response(result)
             except Exception as e:
                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST) 
