@@ -124,3 +124,16 @@ class syncAzureBlob(APIView):
         headers = {'Content-Type': 'application/json','Authorization': 'Basic YWRtaW46YWRtaW4='}
         api=requests.post(url='http://20.253.0.141:8080/api/v1/dags/Azure_Blob_Storage_Dag/dagRuns',headers=headers, data=payload)
         return Response("Data Loading started successfully")
+    
+class getAirflowData(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated] 
+    def get(self,request):
+        cursor=connection.cursor()
+        project_id=request.data.get('project_id')
+        sql=f"select top 1 * from meta_data.airflow.airbyte_metadata where project_id={project_id} order by created_at desc"
+        cursor.execute(sql)
+        records=cursor.fetchall()
+        data=[dict(zip([col[0] for col in cursor.description], row)) for row in records]
+        return Response(data)
+
