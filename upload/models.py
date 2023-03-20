@@ -109,7 +109,7 @@ class WorkflowRules(models.Model):
     is_active = models.BooleanField(blank=True,null=True)
     source_table = models.CharField(max_length=1000,blank = True,null=True)
     target_table = models.CharField(max_length=1000,blank = True,null=True)
-    rules_data = models.TextField()
+    rules_data = models.TextField(blank=True,null=True)
 
 
     def __str__(self):
