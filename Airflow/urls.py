@@ -11,5 +11,5 @@ urlpatterns = [
     path('syncConnection/',views.syncConnection.as_view(), name='SyncConnection'),
     path('syncCsvFile/',views.syncCsvFile.as_view(), name='CSVFile'),
     path('syncAzureBlob/',views.syncAzureBlob.as_view(),name='AzureBlob'),
-    path('getAirflowData',views.getAirflowData.as_view(),name='AirflowData'),
+    path('getAirflowData/<int:project_id>',views.getAirflowData.as_view(),name='AirflowData'),
 ]
