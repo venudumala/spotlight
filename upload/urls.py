@@ -20,7 +20,7 @@ urlpatterns = [
     path('silvergoldtransform/',views.silverGoldTransformView.as_view(),name='silvergoldtansform'),
     path('bronzesilvertransform/',views.bronzeSilverTransform.as_view(),name='bronzeSilverTransform'),
     path('bronzeSilverInsert/',views.bronzeSilverInsert.as_view(),name='bronzeSilverInsert'),
-    path('getSilverTable/<int:project_id>',views.getSilverTable.as_view(),name='getSilverTable'),
+    path('getSilverTable/',views.getSilverTable.as_view(),name='getSilverTable'),
     path('getGoldTable/<str:table_name>',views.getGoldTable.as_view(),name='getGoldTable'),
     path('getSilverSchemaStructure/',views.getSilverSchemaStructure.as_view(),name='getSilverSchemaStructure'),
     path('getSilverSchemaColumn/',views.getSilverSchemaColumn.as_view(),name='getSilverSchemaColumn'),
@@ -37,5 +37,6 @@ urlpatterns = [
     path('dataSource/<int:project_id>/<str:data_source>',views.DataSourceView.as_view()),
     path('getBronzeTableandColumns/<int:project_id>',views.getBronzeTableandColumns.as_view(), name='bronze_table_and_columns'),
     path('workflowrules/', views.worflowRulesView.as_view(), name='rules'),
-    path('workflowrules/project_id/<int:project_id>', views.worflowRulesView.as_view(), name='rules')
+    path('workflowrules/project_id/<int:project_id>', views.worflowRulesView.as_view(), name='rules'),
+    path('workflowrules/<int:id>', views.worflowRulesView.as_view(), name='rules')
 ]
