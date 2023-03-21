@@ -128,9 +128,8 @@ class syncAzureBlob(APIView):
 class getAirflowData(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
     permission_classes = [IsAuthenticated] 
-    def get(self,request):
+    def get(self,request,project_id):
         cursor=connection.cursor()
-        project_id=request.data.get('project_id')
         sql=f"select top 1 * from meta_data.airflow.airbyte_metadata where project_id={project_id} order by created_at desc"
         cursor.execute(sql)
         records=cursor.fetchall()
