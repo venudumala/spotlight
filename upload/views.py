@@ -97,13 +97,17 @@ class createTableView(APIView):
             SCHEMA_NAME="SPOTLIGHT"
             TABLE_NAME=self.request.query_params.get('table_name')
             COLUMN_NAME=self.request.query_params.get('column_name')
+            project_id=self.request.query_params.get('project_id')
+            user_id=request.user.id
             ret = cursor.callproc("proc_create_table",(DB_NAME,SCHEMA_NAME,TABLE_NAME,COLUMN_NAME))
-            cursor.close()
-            project_id = request.session.get('project_id')
             # auditLogs(project_id,"0","Table Creation","Post Table Creation","",'{TABLE_NAME}',"Success","Project has been created",request.user.username,'current_timestamp()',"")
-            return Response("Success!!!")
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            sql=f"insert into SPOTLIGHT.SPOTLIGHT.LAYERWISEDATA(PROJECT_ID,USER_ID,TABLENAME,SCHEMANAME,CREATED_AT,CREATED_BY) values ({project_id},{user_id},'{TABLE_NAME}','SILVER_LAYER',current_timestamp(),current_user())"
+            cursor.execute(sql)
+            cursor.close()
+            return Response("Success!!!")
 
 class DataSourceView(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
@@ -275,10 +279,11 @@ class bronzeSilverTransform(APIView):
 class getSilverTable(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
     permission_classes = [IsAuthenticated]
-    def get(self,request):
+    def get(self,request,project_id):
         try:
+            user_id=request.user.id
             cur = connection.cursor()
-            sql ="SELECT TABLE_NAME from information_schema.tables where TABLE_SCHEMA='SILVER_LAYER' AND TABLE_NAME NOT LIKE '%TEMP_%'"
+            sql =f"SELECT TABLENAME from SPOTLIGHT.SPOTLIGHT.LAYERWISEDATA where SCHEMANAME='SILVER_LAYER' AND PROJECT_ID={project_id} and USER_ID={user_id}"
             cur.execute(sql)
             records = cur.fetch_pandas_all()
             return Response(records)
@@ -757,3 +762,4 @@ class worflowRulesView(APIView):
                 return Response(rules_serializer.errors)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
