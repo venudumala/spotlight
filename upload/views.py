@@ -765,6 +765,8 @@ class worflowRulesView(APIView):
 
 # API to generate file url and save metadata of gold layer
 class getReportUrl(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         project_id = self.request.data.get('project_id')
         user_id = request.user.id
@@ -800,4 +802,4 @@ class getReportUrl(APIView):
             sql = f"""insert into spotlight.spotlight.GOLDLAYERDASHBOARD(USER_ID,PROJECT_ID,TABLE_NAME,ROW_COUNT,FILE_TYPE,FILE_GENERATED_LINK)(select {user_id},{project_id}, table_name,row_count,'CSV','{csv_url}' from INFORMATION_SCHEMA.TABLES where TABLE_CATALOG = 'SPOTLIGHT' AND TABLE_SCHEMA = 'GOLD_LAYER' and table_name = '{table_name.upper()}');"""
             cursor.execute(sql)
             cursor.close()
-            return Response("Success")
+            return Response("Success!!")
