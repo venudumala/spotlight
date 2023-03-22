@@ -762,3 +762,42 @@ class worflowRulesView(APIView):
                 return Response(rules_serializer.errors)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+# API to generate file url and save metadata of gold layer
+class getReportUrl(APIView):
+    def get(self,request):
+        project_id = self.request.data.get('project_id')
+        user_id = request.user.id
+        cursor = connection.cursor()
+        try:
+            sql_select = f"select table_name,row_count,file_generated_link from spotlight.spotlight.GOLDLAYERDASHBOARD where user_id = {user_id} and project_id = {project_id}"
+            cursor.execute(sql_select)
+            records=cursor.fetchall()
+            data = [dict(zip([col[0] for col in cursor.description], row)) for row in records]
+            return Response(data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    def post(self,request):
+        project_id = self.request.data.get('project_id')
+        user_id = request.user.id
+        table_name = self.request.data.get('table_name')
+        cursor = connection.cursor()
+        try:
+            # SQL statement to copy table data into s3 csv file
+            statemnt = f"""COPY INTO @SPOTLIGHT.SPOTLIGHT.REPORT_UNLOAD_STAGE/{table_name}.csv
+            FROM GOLD_LAYER.{table_name} 
+            FILE_FORMAT = (COMPRESSION = NONE TYPE = CSV FIELD_DELIMITER = ',' null_if = ('NULL', 'null') empty_field_as_null = True)
+            single=True
+            overwrite = True
+            Header = True;"""
+            cursor.execute(statemnt)
+            csv_url = f"https://spotlightus.s3.us-east-1.amazonaws.com/unloading/{table_name}.csv"
+            # return Response({"Status":"Data loaded into CSV file successfully!","download_url":csv_url})
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # sql statement to insert data into goldlayerdashboard table
+            sql = f"""insert into spotlight.spotlight.GOLDLAYERDASHBOARD(USER_ID,PROJECT_ID,TABLE_NAME,ROW_COUNT,FILE_TYPE,FILE_GENERATED_LINK)(select {user_id},{project_id}, table_name,row_count,'CSV','{csv_url}' from INFORMATION_SCHEMA.TABLES where TABLE_CATALOG = 'SPOTLIGHT' AND TABLE_SCHEMA = 'GOLD_LAYER' and table_name = '{table_name.upper()}');"""
+            cursor.execute(sql)
+            cursor.close()
+            return Response("Success")
