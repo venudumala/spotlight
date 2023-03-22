@@ -791,7 +791,7 @@ class getReportUrl(APIView):
             overwrite = True
             Header = True;"""
             cursor.execute(statemnt)
-            csv_url = f"https://spotlightus.s3.us-east-1.amazonaws.com/unloading/{table_name}.csv"
+            csv_url = f"https://spotlightus.s3.us-east-1.amazonaws.com/valid_data/{table_name}.csv"
             # return Response({"Status":"Data loaded into CSV file successfully!","download_url":csv_url})
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
