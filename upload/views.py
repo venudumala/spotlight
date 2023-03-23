@@ -786,7 +786,7 @@ class getReportUrl(APIView):
             # SQL statement to copy table data into s3 csv file
             statemnt = f"""COPY INTO @SPOTLIGHT.SPOTLIGHT.REPORT_UNLOAD_STAGE/{table_name}.csv
             FROM GOLD_LAYER.{table_name} 
-            FILE_FORMAT = (COMPRESSION = NONE TYPE = CSV FIELD_DELIMITER = ',' null_if = ('NULL', 'null') empty_field_as_null = True)
+            FILE_FORMAT = (COMPRESSION = NONE TYPE = CSV FIELD_DELIMITER = ',' null_if = ('NULL', 'null') empty_field_as_null = False)
             single=True
             overwrite = True
             Header = True;"""
