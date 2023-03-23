@@ -39,5 +39,5 @@ urlpatterns = [
     path('workflowrules/', views.worflowRulesView.as_view(), name='rules'),
     path('workflowrules/project_id/<int:project_id>', views.worflowRulesView.as_view(), name='rules'),
     path('workflowrules/<int:id>', views.worflowRulesView.as_view(), name='rules'),
-    path('getReportUrl/',views.getReportUrl.as_view(), name='reportUrl'),
+    path('getReportUrl/<int:project_id>',views.getReportUrl.as_view(), name='reportUrl'),
 ]
