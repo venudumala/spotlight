@@ -778,8 +778,7 @@ class getReportUrl(APIView):
             return Response(data)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    def post(self,request):
-        project_id = self.request.data.get('project_id')
+    def post(self,request,project_id):
         user_id = request.user.id
         table_name = self.request.data.get('table_name')
         cursor = connection.cursor()
