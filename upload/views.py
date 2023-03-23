@@ -767,8 +767,7 @@ class worflowRulesView(APIView):
 class getReportUrl(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
     permission_classes = [IsAuthenticated]
-    def get(self,request):
-        project_id = self.request.data.get('project_id')
+    def get(self,request,project_id):
         user_id = request.user.id
         cursor = connection.cursor()
         try:
