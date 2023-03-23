@@ -283,7 +283,7 @@ class getSilverTable(APIView):
         try:
             user_id=request.user.id
             cur = connection.cursor()
-            sql =f"SELECT TABLENAME from SPOTLIGHT.SPOTLIGHT.LAYERWISEDATA where SCHEMANAME='SILVER_LAYER' AND PROJECT_ID={project_id} and USER_ID={user_id}"
+            sql =f"SELECT distinct TABLENAME from SPOTLIGHT.SPOTLIGHT.LAYERWISEDATA where SCHEMANAME='SILVER_LAYER' AND PROJECT_ID={project_id} and USER_ID={user_id}"
             cur.execute(sql)
             records = cur.fetch_pandas_all()
             return Response(records)
