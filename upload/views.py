@@ -248,7 +248,7 @@ class projectDataSourceData(APIView):
         try:
             request.session['project_id'] =self.request.query_params.get('project_id')
             cur = connection.cursor()
-            sql = "select ds.id,pr.PROJECT_NAME, pr.user_id, pr.DESCRIPTION,ds.DATA_SOURCE, ds.TABLE_RECORDS, ds.TOTAL_RECORDS,ds.FINAL_DATA_FILE_GENERATE from SPOTLIGHT.SPOTLIGHT.UPLOAD_PROJECT as pr inner join SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE as ds on pr.id =ds.project_id where pr.id="+self.request.query_params.get('project_id')
+            sql = "select  a.project_name, a.user_id, a.description, a.data_source, b.row_count as TABLE_RECORDS, b.row_count as TOTAL_RECORDS, a.FINAL_DATA_FILE_GENERATE  from (select pr.PROJECT_NAME, pr.user_id, pr.DESCRIPTION,ds.DATA_SOURCE, ds.TABLE_RECORDS, ds.TOTAL_RECORDS,ds.FINAL_DATA_FILE_GENERATE from SPOTLIGHT.SPOTLIGHT.UPLOAD_PROJECT as pr inner join SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE as ds on pr.id =ds.project_id where pr.id="+self.request.query_params.get('project_id')+") a inner join (select table_name,row_count from information_schema.tables where table_schema='BRONZE_LAYER' and table_name not like '_AIRBYTE%') b on upper(a.data_source) = b.table_name;"
             cur.execute(sql)
             records = cur.fetch_pandas_all().to_json(orient='records')
             sql1='select ID,PROJECT_NAME from UPLOAD_PROJECT where id='+self.request.query_params.get('project_id')
