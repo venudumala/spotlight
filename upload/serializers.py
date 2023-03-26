@@ -1,6 +1,6 @@
 import json
 from rest_framework import serializers
-from .models import DataQualityCheck, DataSource, DataType, Database, Project, Upload, WorkflowRules, filterSymbol, goldLayerData
+from .models import DataQualityCheck, DataSource, DataType, Database, Project, Upload, layerDetails, workflowRules, filterSymbol, goldLayerData, workflowTransition
 from django.db import models
 
 
@@ -107,7 +107,7 @@ class goldLayerDataSerializer(serializers.Serializer):
 class WorkflowRulesSerializer(serializers.ModelSerializer):
     rules_data = serializers.SerializerMethodField()
     class Meta:
-        model = WorkflowRules
+        model = workflowRules
         fields = '__all__'
         
     def get_rules_data(self, obj):
@@ -116,13 +116,13 @@ class WorkflowRulesSerializer(serializers.ModelSerializer):
 class WorkflowRulesDeserializer(serializers.ModelSerializer):  
     rules_data = serializers.JSONField()
     class Meta:
-        model = WorkflowRules
+        model = workflowRules
         fields = '__all__'
 
     def create(self, validated_data):
         rules_data = validated_data.pop('rules_data')
         validated_data['rules_data'] = json.dumps(rules_data)
-        return WorkflowRules.objects.create(**validated_data)
+        return workflowRules.objects.create(**validated_data)
     
     def update(self, instance, validated_data):
         rules_data = validated_data.pop('rules_data')
@@ -131,3 +131,23 @@ class WorkflowRulesDeserializer(serializers.ModelSerializer):
             setattr(instance, key, value)
         instance.save()
         return instance
+    
+class layerDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = layerDetails
+        fields = "__all__"
+
+    def create(self, validated_data):
+        return layerDetails.objects.create(**validated_data)
+    
+class workflowTransitionSerializer(serializers.ModelSerializer):
+    projectId=ProjectSerializer()
+    ruleId=WorkflowRulesSerializer()
+    layerId=layerDetailsSerializer()
+
+    class Meta:
+        model = workflowTransition
+        fields = "__all__"
+
+    def create(self, validated_data):
+        return workflowTransition.objects.create(**validated_data)

@@ -99,7 +99,7 @@ class goldLayerData(models.Model):
     records_inserted=models.CharField(max_length=1000,blank = True,null=True)
     final_data_file_generate=models.CharField(max_length=1000,blank = True,null=True)
 
-class WorkflowRules(models.Model):
+class workflowRules(models.Model):
     project_id = models.IntegerField(blank=True,null=True)
     layer = models.CharField(max_length=100,blank = True,null=True)
     created_by = models.CharField(max_length=100,blank = True,null=True)
@@ -113,7 +113,24 @@ class WorkflowRules(models.Model):
 
 
     def __str__(self):
-        return self.title
+        return self.rule_name
+
+    
+class layerDetails(models.Model):
+    layerName= models.CharField(max_length=100,blank = True,null=True)
+    created_at=models.DateTimeField(auto_now=True,blank= True,null=True)
+
+    def __str__(self):
+        return self.layerName
+    
+class workflowTransition(models.Model):
+    projectId = models.ForeignKey(Project,on_delete=models.CASCADE,related_name="workflowRules")
+    layerId = models.ForeignKey(layerDetails,on_delete=models.CASCADE,related_name="workflowRules")
+    ruleId= models.ForeignKey(workflowRules,on_delete=models.CASCADE,related_name="workflowRules")
+    isActive = models.BooleanField(blank=True,null=True)
+    created_by = models.CharField(max_length=100,blank = True,null=True)
+    created_at = models.DateTimeField(auto_now=True,blank = True,null=True)
+
 
 class Audit(models.Model):
   UID=models.UUIDField(primary_key=True,auto_created=True,default=uuid.uuid4,editable=False)

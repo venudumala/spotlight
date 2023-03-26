@@ -1,8 +1,8 @@
 import datetime
 import json
 from django.http import HttpResponse, JsonResponse
-from .models import DataQualityCheck, DataSource, DataType, Database, Project, QueryLogs, Upload, WorkflowRules, filterSymbol, goldLayerData
-from .serializers import DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer, WorkflowRulesDeserializer, WorkflowRulesSerializer, filterSymbolSerializer, goldLayerDataSerializer, projectDataSourceDataSerializer
+from .models import DataQualityCheck, DataSource, DataType, Database, Project, QueryLogs, Upload, layerDetails, workflowRules, filterSymbol, goldLayerData, workflowTransition
+from .serializers import DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer, WorkflowRulesDeserializer, WorkflowRulesSerializer, filterSymbolSerializer, goldLayerDataSerializer, layerDetailsSerializer, projectDataSourceDataSerializer, workflowTransitionSerializer
 from rest_framework import status,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -248,7 +248,7 @@ class projectDataSourceData(APIView):
         try:
             request.session['project_id'] =self.request.query_params.get('project_id')
             cur = connection.cursor()
-            sql = "select  a.project_name, a.user_id, a.description, a.data_source, b.row_count as TABLE_RECORDS, b.row_count as TOTAL_RECORDS, a.FINAL_DATA_FILE_GENERATE  from (select pr.PROJECT_NAME, pr.user_id, pr.DESCRIPTION,ds.DATA_SOURCE, ds.TABLE_RECORDS, ds.TOTAL_RECORDS,ds.FINAL_DATA_FILE_GENERATE from SPOTLIGHT.SPOTLIGHT.UPLOAD_PROJECT as pr inner join SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE as ds on pr.id =ds.project_id where pr.id="+self.request.query_params.get('project_id')+") a inner join (select table_name,row_count from information_schema.tables where table_schema='BRONZE_LAYER' and table_name not like '_AIRBYTE%') b on upper(a.data_source) = b.table_name;"
+            sql = "select ds.id,pr.PROJECT_NAME, pr.user_id, pr.DESCRIPTION,ds.DATA_SOURCE, ds.TABLE_RECORDS, ds.TOTAL_RECORDS,ds.FINAL_DATA_FILE_GENERATE from SPOTLIGHT.SPOTLIGHT.UPLOAD_PROJECT as pr inner join SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE as ds on pr.id =ds.project_id where pr.id="+self.request.query_params.get('project_id')
             cur.execute(sql)
             records = cur.fetch_pandas_all().to_json(orient='records')
             sql1='select ID,PROJECT_NAME from UPLOAD_PROJECT where id='+self.request.query_params.get('project_id')
@@ -283,7 +283,7 @@ class getSilverTable(APIView):
         try:
             user_id=request.user.id
             cur = connection.cursor()
-            sql =f"SELECT distinct TABLENAME from SPOTLIGHT.SPOTLIGHT.LAYERWISEDATA where SCHEMANAME='SILVER_LAYER' AND PROJECT_ID={project_id} and USER_ID={user_id}"
+            sql =f"SELECT TABLENAME from SPOTLIGHT.SPOTLIGHT.LAYERWISEDATA where SCHEMANAME='SILVER_LAYER' AND PROJECT_ID={project_id} and USER_ID={user_id}"
             cur.execute(sql)
             records = cur.fetch_pandas_all()
             return Response(records)
@@ -583,21 +583,7 @@ def auditLogs(PROJECT_ID,DATASOURCE,OPERATION,CALLED_FUNCTION_NAME,LAYER,TABLE_N
         cursor.close()
     except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    
-# Edited after this
-# class goldDataPreview(APIView):
-#     authentication_classes = [JSONWebTokenAuthentication]
-#     permission_classes = [IsAuthenticated]
-#     def get(self,request):
-#         try:
-#             query_str=self.request.query_params.get('query_str')
-#             cur = connection.cursor()
-#             sql = query_str + " lIMIT 15"
-#             cur.execute(sql)
-#             records = cur.fetch_pandas_all().to_json(orient='records')
-#         except Exception as e:
-#             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-#         return Response(records)
+
 
 class goldDataPreview(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
@@ -732,9 +718,19 @@ class getBronzeTableandColumns(APIView):
 
 
 class worflowRulesView(APIView):
+    # authentication_classes = [JSONWebTokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     def get(self, request,project_id):
         try:
-            data = WorkflowRules.objects.filter(project_id=project_id)
+            data = workflowRules.objects.filter(project_id=project_id)
+            databaseserializer=WorkflowRulesSerializer(data,many=True)
+            return JsonResponse(databaseserializer.data, safe=False)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+    def get(self, request,project_id,layer_id):
+        try:
+            data = workflowRules.objects.filter(project_id=project_id).filter(layer=layer_id)
             databaseserializer=WorkflowRulesSerializer(data,many=True)
             return JsonResponse(databaseserializer.data, safe=False)
         except Exception as e:
@@ -753,13 +749,55 @@ class worflowRulesView(APIView):
         
     def put(self,request,id):
         try:
-            rules=WorkflowRules.objects.get(pk=id)
+            rules=workflowRules.objects.get(pk=id)
             rules_serializer=WorkflowRulesDeserializer(rules, data=request.data)
             if rules_serializer.is_valid():
                 rules_serializer.save()
                 return Response(rules_serializer.data)
             else:
                 return Response(rules_serializer.errors)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+class layerDetailsView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        layerDetails=layerDetails.objects.all()
+        layerDetailserializer=layerDetailsSerializer(layerDetails,many=True)
+        return Response(layerDetailserializer.data)
+
+    def post(self,request):
+        layerDetails_serializer=layerDetailsSerializer(data=request.data)
+        if layerDetails_serializer.is_valid():
+            layerDetails_serializer.save()
+            return Response(layerDetails_serializer.data)
+        
+        else:
+            return Response(layerDetails_serializer.errors)
+        
+class workflowTransitionView(APIView):
+    # authentication_classes = [JSONWebTokenAuthentication]
+    # permission_classes = [IsAuthenticated]
+    def get(self,request):
+        workflowTransit=workflowTransition.objects.all()
+        workflowTransitionserializer=workflowTransitionSerializer(workflowTransit,many=True)
+        return Response(workflowTransitionserializer.data)
+
+    def post(self,request):
+        workflowTransition_serializer=workflowTransitionSerializer(data=request.data)
+        if workflowTransition_serializer.is_valid():
+            workflowTransition_serializer.save()
+            return Response(workflowTransition_serializer.data)
+        
+        else:
+            return Response(workflowTransition_serializer.errors)
+    
+    def get(self, request,project_id):
+        try:
+            workflowTransit = workflowTransition.objects.filter(projectId=project_id)
+            workflowTransitserializer=workflowTransitionSerializer(workflowTransit,many=True)
+            return JsonResponse(workflowTransitserializer.data, safe=False)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
