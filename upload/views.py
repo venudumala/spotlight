@@ -718,8 +718,8 @@ class getBronzeTableandColumns(APIView):
 
 
 class worflowRulesView(APIView):
-    # authentication_classes = [JSONWebTokenAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request,project_id):
         try:
             data = workflowRules.objects.filter(project_id=project_id)
@@ -777,8 +777,8 @@ class layerDetailsView(APIView):
             return Response(layerDetails_serializer.errors)
         
 class workflowTransitionView(APIView):
-    # authentication_classes = [JSONWebTokenAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         workflowTransit=workflowTransition.objects.all()
         workflowTransitionserializer=workflowTransitionSerializer(workflowTransit,many=True)
