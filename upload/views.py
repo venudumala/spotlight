@@ -739,10 +739,10 @@ class worflowRulesView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
-    def put(self,request,id):
+    def patch(self,request,id):
         try:
             rules=workflowRules.objects.get(pk=id)
-            rules_serializer=WorkflowRulesDeserializer(rules, data=request.data)
+            rules_serializer=WorkflowRulesDeserializer(rules, data=request.data, partial=True)
             if rules_serializer.is_valid():
                 rules_serializer.save()
                 return Response(rules_serializer.data)

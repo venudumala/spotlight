@@ -125,10 +125,6 @@ class WorkflowRulesDeserializer(serializers.ModelSerializer):
         return workflowRules.objects.create(**validated_data)
     
     def update(self, instance, validated_data):
-        rules_data = validated_data.pop('rules_data')
-        validated_data['rules_data'] = json.dumps(rules_data)
-        for key, value in validated_data.items():
-            setattr(instance, key, value)
         instance.save()
         return instance
     
