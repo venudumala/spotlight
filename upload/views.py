@@ -764,8 +764,8 @@ class layerDetailsView(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self,request):
-        layerDetails=layerDetails.objects.all()
-        layerDetailserializer=layerDetailsSerializer(layerDetails,many=True)
+        layer_Details=layerDetails.objects.all()
+        layerDetailserializer=layerDetailsSerializer(layer_Details,many=True)
         return Response(layerDetailserializer.data)
 
     def post(self,request):
