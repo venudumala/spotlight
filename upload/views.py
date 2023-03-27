@@ -727,14 +727,6 @@ class worflowRulesView(APIView):
             return JsonResponse(databaseserializer.data, safe=False)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
-    def get(self, request,project_id,layer_id):
-        try:
-            data = workflowRules.objects.filter(project_id=project_id).filter(layer=layer_id)
-            databaseserializer=WorkflowRulesSerializer(data,many=True)
-            return JsonResponse(databaseserializer.data, safe=False)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self,request):
         try:
@@ -758,7 +750,16 @@ class worflowRulesView(APIView):
                 return Response(rules_serializer.errors)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
+
+class dataWithProject_RuleView(APIView):
+    def get(self, request,project_id,layer_id):
+        try:
+            data_layer_id = workflowRules.objects.filter(project_id=project_id).filter(layer=layer_id)
+            data_layer_idserializer=WorkflowRulesSerializer(data_layer_id,many=True)
+            return JsonResponse(data_layer_idserializer.data, safe=False)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 class layerDetailsView(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
     permission_classes = [IsAuthenticated]
