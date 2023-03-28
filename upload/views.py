@@ -649,7 +649,7 @@ class goldDataCreate(APIView):
             cur.execute(sql)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response("Success !!!!")
+        return Response(sql)
     
 class goldDataInsert(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
