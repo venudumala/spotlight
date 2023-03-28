@@ -125,6 +125,7 @@ class WorkflowRulesDeserializer(serializers.ModelSerializer):
         return workflowRules.objects.create(**validated_data)
     
     def update(self, instance, validated_data):
+        instance.is_active=validated_data.get('is_active',instance.is_active)
         instance.save()
         return instance
     
