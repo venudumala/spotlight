@@ -151,4 +151,4 @@ class workflowTransitionSerializer(serializers.ModelSerializer):
 class auditserializer(serializers.ModelSerializer): 
     class Meta: 
         model=Audit 
-        fields=('OPERATION','LAYER','CREATED_BY','CREATED_AT','STATUS','MESSAGE')
+        fields=('PROJECT_ID','OPERATION','LAYER','CREATED_BY','CREATED_AT','STATUS','MESSAGE')
