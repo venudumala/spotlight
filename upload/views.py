@@ -1,8 +1,8 @@
 import datetime
 import json
 from django.http import HttpResponse, JsonResponse
-from .models import DataQualityCheck, DataSource, DataType, Database, Project, QueryLogs, Upload, layerDetails, workflowRules, filterSymbol, goldLayerData, workflowTransition
-from .serializers import DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer, WorkflowRulesDeserializer, WorkflowRulesSerializer, filterSymbolSerializer, goldLayerDataSerializer, layerDetailsSerializer, projectDataSourceDataSerializer, workflowTransitionSerializer
+from .models import Audit,DataQualityCheck, DataSource, DataType, Database, Project, QueryLogs, Upload, layerDetails, workflowRules, filterSymbol, goldLayerData, workflowTransition
+from .serializers import auditserializer,DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer, WorkflowRulesDeserializer, WorkflowRulesSerializer, filterSymbolSerializer, goldLayerDataSerializer, layerDetailsSerializer, projectDataSourceDataSerializer, workflowTransitionSerializer
 from rest_framework import status,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -840,3 +840,14 @@ class getReportUrl(APIView):
             cursor.execute(sql)
             cursor.close()
             return Response("Success!!")
+
+class auditView(APIView):
+    authentication_classes = [JSONWebTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request,project_id):
+        try:
+            auditlog=Audit.objects.filter(project_id=project_id)
+            audit=auditserializer(auditlog,many=True)
+            return Response(audit.data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

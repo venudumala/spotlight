@@ -43,5 +43,6 @@ urlpatterns = [
     path('layerdetails/',views.layerDetailsView.as_view(),name='layerDetailsView'),
     path('workflowTransition/',views.workflowTransitionView.as_view(),name='workflowTransitionView'),
     path('workflowTransition/project_id/<int:project_id>', views.workflowTransitionView.as_view(), name='workflowTransitionView'),
-    path('getReportUrl/<int:project_id>',views.getReportUrl.as_view(), name='reportUrl')
+    path('getReportUrl/<int:project_id>',views.getReportUrl.as_view(), name='reportUrl'),
+    path('audit/<int:project_id>',views.auditView.as_view(),name='auditView')
 ] 

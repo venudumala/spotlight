@@ -1,6 +1,6 @@
 import json
 from rest_framework import serializers
-from .models import DataQualityCheck, DataSource, DataType, Database, Project, Upload, layerDetails, workflowRules, filterSymbol, goldLayerData, workflowTransition
+from .models import DataQualityCheck, DataSource, DataType, Database, Project, Upload, layerDetails, workflowRules, filterSymbol, goldLayerData, workflowTransition,Audit
 from django.db import models
 
 
@@ -147,3 +147,8 @@ class workflowTransitionSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return workflowTransition.objects.create(**validated_data)
+    
+class auditserializer(serializers.ModelSerializer): 
+    class Meta: 
+        model=Audit 
+        fields=('PROJECT_ID','OPERATION','LAYER','CREATED_BY','CREATED_AT','STATUS','MESSAGE')
