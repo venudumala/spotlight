@@ -125,8 +125,8 @@ class DataSourceView(APIView):
             cursor = connection.cursor()
             cursor.callproc("proc_create_datasource",(project_id,data_source))
             cursor.close()
-            project_ids = request.session.get('project_id')
-            auditLogs(project_ids,data_source,"Data Source Creation","Post Data Source Creation","silver","Data Source","Success","Data Source has been created",request.user.username)
+            # project_ids = request.session.get('project_id')
+            auditLogs(project_id,data_source,"Data Source Creation","Post Data Source Creation","silver","Data Source","Success","Data Source has been created",request.user.username)
             return Response("Success!!!")
         except Exception as e:
             auditLogs(project_id,"","Data Source Creation","Post Data Source Creation","silver","Data Source","Failed",'error'+" "+str(e),request.user.username)
@@ -198,6 +198,7 @@ class dataQualityCheck(APIView):
 
     def post(self,request):
         try:
+            
             with connection.cursor() as cursor:
                 fields = set()
                 for item in request.data:
@@ -207,7 +208,7 @@ class dataQualityCheck(APIView):
                     values = [f"'{item.get(field, 'NULL')}'" for field in fields]
                     statement = f"INSERT INTO SPOTLIGHT.UPLOAD_DATAQUALITYCHECK ({','.join(fields)}) VALUES ({','.join(['%s'] * len(fields))});"
                     cursor.execute(statement % tuple((values)))
-            auditLogs(request.session.get('project_id'),"","Data Quality Creation","Post Data Quality Creation","","UPLOAD_DATAQUALITYCHECK","Success","Data Source has been created",request.user.username)
+            auditLogs("0","","Data Quality Creation","Post Data Quality Creation","","UPLOAD_DATAQUALITYCHECK","Success","Data Source has been created",request.user.username)
             return Response("Success!!!")
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -248,7 +249,7 @@ class projectDataSourceData(APIView):
         try:
             request.session['project_id'] =self.request.query_params.get('project_id')
             cur = connection.cursor()
-            sql = "select ds.id,pr.PROJECT_NAME, pr.user_id, pr.DESCRIPTION,ds.DATA_SOURCE, ds.TABLE_RECORDS, ds.TOTAL_RECORDS,ds.FINAL_DATA_FILE_GENERATE from SPOTLIGHT.SPOTLIGHT.UPLOAD_PROJECT as pr inner join SPOTLIGHT.SPOTLIGHT.UPLOAD_DATASOURCE as ds on pr.id =ds.project_id where pr.id="+self.request.query_params.get('project_id')
+            sql = "select * from data_source_dashboard where project_id="+self.request.query_params.get('project_id')
             cur.execute(sql)
             records = cur.fetch_pandas_all().to_json(orient='records')
             sql1='select ID,PROJECT_NAME from UPLOAD_PROJECT where id='+self.request.query_params.get('project_id')
@@ -283,7 +284,7 @@ class getSilverTable(APIView):
         try:
             user_id=request.user.id
             cur = connection.cursor()
-            sql =f"SELECT TABLENAME from SPOTLIGHT.SPOTLIGHT.LAYERWISEDATA where SCHEMANAME='SILVER_LAYER' AND PROJECT_ID={project_id} and USER_ID={user_id}"
+            sql =f"SELECT distinct TABLENAME from SPOTLIGHT.SPOTLIGHT.LAYERWISEDATA where SCHEMANAME='SILVER_LAYER' AND PROJECT_ID={project_id} and USER_ID={user_id}"
             cur.execute(sql)
             records = cur.fetch_pandas_all()
             return Response(records)
@@ -846,7 +847,7 @@ class auditView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request,project_id):
         try:
-            auditlog=Audit.objects.filter(project_id=project_id)
+            auditlog=Audit.objects.filter(PROJECT_ID=project_id)
             audit=auditserializer(auditlog,many=True)
             return Response(audit.data)
         except Exception as e:
