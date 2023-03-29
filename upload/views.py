@@ -847,7 +847,7 @@ class auditView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request,project_id):
         try:
-            auditlog=Audit.objects.filter(PROJECT_ID=project_id)
+            auditlog=Audit.objects.filter(PROJECT_ID=project_id).order_by('-CREATED_AT')
             audit=auditserializer(auditlog,many=True)
             return Response(audit.data)
         except Exception as e:
