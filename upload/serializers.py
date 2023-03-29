@@ -138,11 +138,10 @@ class layerDetailsSerializer(serializers.ModelSerializer):
         return layerDetails.objects.create(**validated_data)
     
 class workflowTransitionSerializer(serializers.ModelSerializer):
-    projectId=ProjectSerializer()
-    ruleId=WorkflowRulesSerializer()
-    layerId=layerDetailsSerializer()
-
     class Meta:
+        projectId=ProjectSerializer()
+        ruleId=WorkflowRulesSerializer()
+        layerId=layerDetailsSerializer()
         model = workflowTransition
         fields = "__all__"
 
