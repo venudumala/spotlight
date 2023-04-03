@@ -147,7 +147,15 @@ class workflowTransitionSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return workflowTransition.objects.create(**validated_data)
-    
+
+class workflowAllTransitionSerializer(serializers.ModelSerializer):
+    projectId=ProjectSerializer()
+    ruleId=WorkflowRulesSerializer()
+    layerId=layerDetailsSerializer()
+    class Meta:
+        model = workflowTransition
+        fields = "__all__"
+           
 class auditserializer(serializers.ModelSerializer): 
     class Meta: 
         model=Audit 

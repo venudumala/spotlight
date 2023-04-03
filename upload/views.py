@@ -2,7 +2,7 @@ import datetime
 import json
 from django.http import HttpResponse, JsonResponse
 from .models import Audit,DataQualityCheck, DataSource, DataType, Database, Project, QueryLogs, Upload, layerDetails, workflowRules, filterSymbol, goldLayerData, workflowTransition
-from .serializers import auditserializer,DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer, WorkflowRulesDeserializer, WorkflowRulesSerializer, filterSymbolSerializer, goldLayerDataSerializer, layerDetailsSerializer, projectDataSourceDataSerializer, workflowTransitionSerializer
+from .serializers import auditserializer,DataQualityCheckSerializer, DataSourceSerializer, DataTypeSerializer, DatabaseSerializer, ProjectSerializer, QueryLogsSerializer, UploadSerializer, WorkflowRulesDeserializer, WorkflowRulesSerializer, filterSymbolSerializer, goldLayerDataSerializer, layerDetailsSerializer, projectDataSourceDataSerializer, workflowAllTransitionSerializer, workflowTransitionSerializer
 from rest_framework import status,viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -808,7 +808,7 @@ class workflowTransitionView(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self,request):
-        workflowTransit=workflowTransition.objects.all()
+        workflowTransit=workflowTransition.objects.all().order_by('created_by')
         workflowTransitionserializer=workflowTransitionSerializer(workflowTransit,many=True)
         return Response(workflowTransitionserializer.data)
 
@@ -823,8 +823,8 @@ class workflowTransitionView(APIView):
     
     def get(self, request,project_id):
         try:
-            workflowTransit = workflowTransition.objects.filter(projectId=project_id)
-            workflowTransitserializer=workflowTransitionSerializer(workflowTransit,many=True)
+            workflowTransit = workflowTransition.objects.filter(projectId=project_id).order_by('created_by')
+            workflowTransitserializer=workflowAllTransitionSerializer(workflowTransit,many=True)
             return JsonResponse(workflowTransitserializer.data, safe=False)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
