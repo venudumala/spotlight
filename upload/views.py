@@ -105,7 +105,7 @@ class createTableView(APIView):
             SCHEMA_NAME="SPOTLIGHT"
             TABLE_NAME=self.request.query_params.get('table_name')
             COLUMN_NAME=self.request.query_params.get('column_name')
-            project_id=self.request.query_params.get('project_id')
+            project_id=request.session.get('project_id')
             user_id=request.user.id
             ret = cursor.callproc("proc_create_table",(DB_NAME,SCHEMA_NAME,TABLE_NAME,COLUMN_NAME))
             auditLogs(project_id,"0","Table Creation","Post Table Creation","silver",TABLE_NAME,"Success","Table has been created successfully",request.user.username)
@@ -134,7 +134,7 @@ class DataSourceView(APIView):
             cursor = connection.cursor()
             cursor.callproc("proc_create_datasource",(project_id,data_source))
             cursor.close()
-            project_id=self.request.query_params.get('project_id')
+            project_id=request.session.get('project_id')
             auditLogs(project_id,data_source,"Data Source Creation","Post Data Source Creation","Bronze","DataSource","Success","Data Source has been created",request.user.username)
             return Response("Success!!!")
         except Exception as e:
@@ -207,7 +207,7 @@ class dataQualityCheck(APIView):
 
     def post(self,request):
         try:
-            project_id = self.request.query_params.get('project_id')
+            project_id = request.session.get('project_id')
             with connection.cursor() as cursor:
                 fields = set()
                 for item in request.data:
@@ -281,7 +281,7 @@ class bronzeSilverTransform(APIView):
             string1=self.request.query_params.get('columns_name').replace("'",'')
             string2=string1.replace('[','')
             columns_name=string2.replace(']','')
-            project_id=self.request.query_params.get('project_id')
+            project_id=request.session.get('project_id')
             sql ="Insert into SPOTLIGHT.SILVER_LAYER."+self.request.query_params.get('silver_table') +"("+columns_name+")"+ " select "+columns_name+" from SPOTLIGHT.BRONZE_LAYER."+self.request.query_params.get('bronze_table')
             cur.execute(sql)
             auditLogs(project_id,"bronze","Data Inserted in Silver Table","bronzeSilverTransform","BRONZE to SILVER",str(self.request.query_params.get('silver_table')),"Success","Data has been inserted into silver layer",request.user.username)
@@ -351,7 +351,7 @@ class silverGoldTransformView(APIView):
             cursor = connection.cursor()
             TABLE_NAME=self.request.query_params.get('TABLE_NAME')
             COLUMNS_NAME=self.request.query_params.get('COLUMNS_NAME')
-            project_id=self.request.query_params.get('project_id')
+            project_id=request.session.get('project_id')
             FILTER_CONDITIONS=self.request.query_params.get('FILTER_CONDITIONS')
             ret = cursor.callproc("PROC_TEMP_SILVER_GOLD_TANSFORM",(TABLE_NAME,COLUMNS_NAME, FILTER_CONDITIONS))
             auditLogs(project_id,"0","Data Inserted in Gold Table","silverGoldTransformView","SILVER to GOLD",TABLE_NAME,"Success","Data has been added",request.user.username)
@@ -373,7 +373,7 @@ class bronzeSilverInsert(APIView):
             FIRST_CLAUSE=self.request.query_params.get('FIRST_CLAUSE')
             SECOND_CLAUSE=self.request.query_params.get('SECOND_CLAUSE')
             COLUMNS_NAME=self.request.query_params.get('COLUMNS_NAME')
-            project_id=self.request.query_params.get('project_id')
+            project_id=request.session.get('project_id')
             sql="create or replace table SILVER_LAYER.TEMP_"+TARGET_TABLE_NAME+ " as select "+COLUMNS_NAME +" from "+SOURCE_TABLE_NAME1+" "+JOIN_STATEMENT +" "+SOURCE_TABLE_NAME2+ " on "+FIRST_CLAUSE+" = "+SECOND_CLAUSE
             auditLogs(project_id,"0","Data Inserted in silver Table","bronzeSilverInsertview","bronze to silver",TARGET_TABLE_NAME,"Success","Data has been added into silver layer",request.user.username)
             cur.execute(sql)
@@ -550,7 +550,7 @@ class silverDataInsert(APIView):
             SILVER_TABLE_NAME=self.request.query_params.get('silver_table_name')
             TEMP_SILVER_TABLE_NAME="TEMP_"+SILVER_TABLE_NAME
             COLUMN_NAME=self.request.query_params.get('column_name')
-            project_id=self.request.query_params.get('project_id')
+            project_id=request.session.get('project_id')
             ret = cur.callproc("proc_check_dataquality",(SILVER_TABLE_NAME,TEMP_SILVER_TABLE_NAME,COLUMN_NAME))
             cur.close()
             auditLogs(project_id,"0","Data Insert into silver Table","SilverInsertview","silver to silver",SILVER_TABLE_NAME,"Success","Data has been added",request.user.username)
@@ -652,7 +652,7 @@ class goldDataCreate(APIView):
             custom_stmt=self.request.query_params.get('custom_stmt')
             tbl_name = self.request.query_params.get('tbl_name')
             col_list = self.request.query_params.get('col_list')
-            project_id = self.request.query_params.get('project_id')
+            project_id = request.session.get('project_id')
             query_str = "SELECT " + col_list 
             if(case_stmt):
                 query_str += " , " + case_stmt
@@ -752,7 +752,7 @@ class worflowRulesView(APIView):
 
     def post(self,request):
         try:
-            project_id = self.request.query_params.get('project_id')
+            project_id = request.session.get('project_id')
             database_serializer=WorkflowRulesDeserializer(data=request.data)
             if database_serializer.is_valid():
                 database_serializer.save()
